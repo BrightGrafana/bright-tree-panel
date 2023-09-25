@@ -1,0 +1,44 @@
+{
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "type": "panel",
+  "name": "Interactive Tree Panel",
+  "id": "equansnl-tree-panel",
+  "info": {
+    "keywords": [
+      "panel"
+    ],
+    "description": "View data, from a table data source, as a interactive tree like structure",
+    "author": {
+      "name": "Equans NL"
+    },
+    "logos": {
+      "small": "https://equansdatahub.azureedge.net/grafana-tree-panel/logo.svg",
+      "large": "https://equansdatahub.azureedge.net/grafana-tree-panel/logo.svg"
+    },
+    "links": [],
+    "screenshots": [
+      {
+        "name": "Tree panel",
+        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree.png"
+      },
+      {
+        "name": "Tree panel item count",
+        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/src/img/Screenshot tree item count.png"
+      },
+      {
+        "name": "Tree panel options",
+        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree options.png"
+      },
+      {
+        "name": "Tree panel advanced options",
+        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree advanced options.png"
+      }
+    ],
+    "version": "%VERSION%",
+    "updated": "%TODAY%"
+  },
+  "dependencies": {
+    "grafanaDependency": ">=9.5.2",
+    "plugins": []
+  }
+}
