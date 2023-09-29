@@ -2,7 +2,7 @@ version: '3.0'
 
 services:
   grafana:
-    container_name: 'equans-tree-panel'
+    container_name: 'bright-tree-panel'
     build:
       context: ./.config
       args:
@@ -10,5 +10,5 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
-      - ./dist:/var/lib/grafana/plugins/equans-tree-panel
+      - ./dist:/var/lib/grafana/plugins/bright-tree-panel
       - ./provisioning:/etc/grafana/provisioning
