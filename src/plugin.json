@@ -2,7 +2,7 @@
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
   "type": "panel",
   "name": "Interactive Tree Panel",
-  "id": "bright-tree-panel",
+  "id": "equansdatahub-tree-panel",
   "info": {
     "keywords": [
       "panel"
