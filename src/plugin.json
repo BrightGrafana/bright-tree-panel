@@ -12,33 +12,33 @@
       "name": "Equans NL"
     },
     "logos": {
-      "small": "https://equansdatahub.azureedge.net/grafana-tree-panel/logo.svg",
-      "large": "https://equansdatahub.azureedge.net/grafana-tree-panel/logo.svg"
+      "small": "img/logo.svg",
+      "large": "img/logo.svg"
     },
     "links": [],
     "screenshots": [
       {
         "name": "Tree panel",
-        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree.png"
+        "path": "img/Screenshot tree.png"
       },
       {
         "name": "Tree panel item count",
-        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/src/img/Screenshot tree item count.png"
+        "path": "img/Screenshot tree item count.png"
       },
       {
         "name": "Tree panel options",
-        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree options.png"
+        "path": "img/Screenshot tree options.png"
       },
       {
         "name": "Tree panel advanced options",
-        "path": "https://equansdatahub.azureedge.net/grafana-tree-panel/Screenshot tree advanced options.png"
+        "path": "img/Screenshot tree advanced options.png"
       }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=9.5.2",
+    "grafanaDependency": ">=10.0.0",
     "plugins": []
   }
 }
