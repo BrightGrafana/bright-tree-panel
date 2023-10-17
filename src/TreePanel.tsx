@@ -4,7 +4,7 @@ import { TreeView, TreeItem } from '@material-ui/lab';
 import { ExpandMore, ChevronRight } from '@material-ui/icons';
 import React from 'react';
 import { Utils, Validator } from './';
-import { Node, PanelOptions, TreeLevelOrderMode, TreeClickEventControlMode } from './models';
+import { Node, PanelOptions, TreeLevelOrderMode, TreeClickEventControlMode, RawNode } from './models';
 import './CSS/classes.css';
 
 // TODO: try and moe into the Tree function
@@ -55,10 +55,12 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   const customJsFn = new Function('data', 'locationService', 'getTemplateSrv', options.onClick);
 
   // Convert data to a Node array
-  const queryResult: Node[] = React.useMemo(
+  const queryResult: RawNode[] = React.useMemo(
     () => Utils.dfToNodeArray(data.series[0], options.idColumn, options.parentIdColumn, options.labelColumn),
     [data, options.idColumn, options.parentIdColumn, options.labelColumn]
   );
+
+  Validator.validateTreeInput(queryResult);
 
   // Build the tree hierarchy
   const tree: Node[] = React.useMemo(() => {
@@ -67,7 +69,12 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
     }
 
     function getChildrenOfNode(node: Node): Node[] {
-      return queryResult.filter((row) => row.parent === node.id)!;
+      return queryResult
+        .filter((row) => row.parent === node.id)
+        .map((rawNode) => {
+          const node: Node = { ...rawNode, children: [] };
+          return node;
+        });
     }
 
     function addChildNodes(rootNodes: Node[]): Node[] {
@@ -89,10 +96,14 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
       });
     }
 
-    const newTree = addChildNodes(getRootNodes(queryResult));
-    Validator.validateTreeInput(newTree);
-
-    return newTree;
+    return addChildNodes(
+      getRootNodes(
+        queryResult.map((rawNode) => {
+          const node: Node = { ...rawNode, children: [] };
+          return node;
+        })
+      )
+    );
   }, [queryResult, options.orderLevels]);
 
   // Determine expanded nodes

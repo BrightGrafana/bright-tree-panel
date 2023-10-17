@@ -1,6 +1,5 @@
-export interface Node {
-    id: string;
-    parent?: string;
-    name: string;
-    children?: Node[];
+import { RawNode } from "./raw-node";
+
+export interface Node extends RawNode {
+    children: Node[];
 }

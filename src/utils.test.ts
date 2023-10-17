@@ -100,8 +100,8 @@ describe('Utils', () => {
             const result = Utils.dfToNodeArray(new MutableDataFrame(data), 'id', 'parentId', 'label');
 
             expect(result).toEqual([
-                { name: 'Node 1', id: '1', parent: undefined, children: [] },
-                { name: 'Node 2', id: '2', parent: '1', children: [] },
+                { name: 'Node 1', id: '1', parent: undefined },
+                { name: 'Node 2', id: '2', parent: '1' },
             ]);
         });
     });

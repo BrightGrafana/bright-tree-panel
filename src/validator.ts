@@ -1,4 +1,4 @@
-import { Node } from './models';
+import { RawNode } from './models';
 
 /**
  * A utility class for validating a tree structure represented by an array of nodes.
@@ -6,22 +6,17 @@ import { Node } from './models';
 export class Validator {
     /**
      * Validates the input tree for duplicate node IDs and child relationships.
-     * @param {Node[]} tree - The array of nodes representing the tree structure.
+     * @param {RawNode[]} tree - The array of nodes representing the tree structure.
      * @throws {Error} If a duplicate node ID is found.
      */
-    public static validateTreeInput(tree: Node[]): void {
+    public static validateTreeInput(tree: RawNode[]): void {
         /**
          * Set to store encountered node IDs.
-         * @type {Set<Node['id']>}
+         * @type {Set<RawNode['id']>}
          */
-        const nodeIds: Set<Node['id']> = new Set();
+        const nodeIds: Set<RawNode['id']> = new Set();
 
-        /**
-         * Recursively validates node IDs and child relationships.
-         * @param {Node} node - The node to validate.
-         * @throws {Error} If a duplicate node ID is found.
-         */
-        function validateIds(node: Node): void {
+        tree.forEach((node: RawNode) => {
             if (nodeIds.has(node.id)) {
                 throw new ReferenceError(`Duplicated ID found for: ${node.id}`);
             }
@@ -30,21 +25,14 @@ export class Validator {
             }
 
             nodeIds.add(node.id);
-
-            if (node.children) {
-                node.children.forEach(validateIds);
-            }
-        }
-
-        tree.forEach(validateIds);
+        });
 
         // list of all ID's is build
 
-        function validateParents(node: Node): void {
+        tree.forEach((node: RawNode) => {
             if (node.parent && !nodeIds.has(node.parent)) {
                 throw new ReferenceError(`Parent not found for id ${node.id} parent ${node.parent}`);
             }
-        }
-        tree.forEach(validateParents);
+        });
     }
 }
