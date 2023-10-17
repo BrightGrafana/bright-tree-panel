@@ -76,7 +76,7 @@ export class Utils {
     return data.map((dfRow) => ({
       name: `${dfRow[labelColumn]}`,
       id: `${dfRow[idColumn]}`,
-      parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : null,
+      parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
       children: [] as Node[],
     }));
   }
