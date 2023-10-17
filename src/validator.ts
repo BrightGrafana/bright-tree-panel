@@ -1,4 +1,4 @@
-import { RawNode } from './models';
+import { RawNode, Node } from './models';
 
 /**
  * A utility class for validating a tree structure represented by an array of nodes.
@@ -6,17 +6,17 @@ import { RawNode } from './models';
 export class Validator {
     /**
      * Validates the input tree for duplicate node IDs and child relationships.
-     * @param {RawNode[]} tree - The array of nodes representing the tree structure.
+     * @param {RawNode[]} rawNodes - The array of nodes representing the tree structure.
      * @throws {Error} If a duplicate node ID is found.
      */
-    public static validateTreeInput(tree: RawNode[]): void {
+    public static validateTreeInput(rawNodes: RawNode[]): void {
         /**
          * Set to store encountered node IDs.
          * @type {Set<RawNode['id']>}
          */
         const nodeIds: Set<RawNode['id']> = new Set();
 
-        tree.forEach((node: RawNode) => {
+        rawNodes.forEach((node: RawNode) => {
             if (nodeIds.has(node.id)) {
                 throw new ReferenceError(`Duplicated ID found for: ${node.id}`);
             }
@@ -29,10 +29,30 @@ export class Validator {
 
         // list of all ID's is build
 
-        tree.forEach((node: RawNode) => {
+        rawNodes.forEach((node: RawNode) => {
             if (node.parent && !nodeIds.has(node.parent)) {
                 throw new ReferenceError(`Parent not found for id ${node.id} parent ${node.parent}`);
             }
         });
+    }
+
+    public static validateTreeBranches(rawNodes: RawNode[], tree: Node[]): void {
+        // fetch all nodes in tree.
+        const treeNodes: string[] = [];
+        const findNodeIds = (nodes: Node[]) => {
+            nodes.forEach((node) => {
+                treeNodes.push(node.id);
+                if (node.children) {
+                    findNodeIds(node.children);
+                }
+            });
+        };
+
+        // find unused (detached) rawNodes
+        rawNodes.forEach(node => {
+            if (!treeNodes.includes(node.id)) {
+                throw new ReferenceError(`Detached branch detected for id: ${node.id}`)
+            }
+        })
     }
 }

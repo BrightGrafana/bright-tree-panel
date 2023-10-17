@@ -44,8 +44,9 @@ describe('Validator', () => {
             // assert
             expect(result).toThrowError('Parent can not be mapped to it self. for: 2');
         });
-
-        xit('should throw error if detached branch is found', () => {
+    });
+    describe('validateTreeBranches', () => {
+        it('should throw error if detached branch is found', () => {
             // arrange
             const input: RawNode[] = [
                 { id: '1', name: 'n1', parent: '2' },
@@ -53,12 +54,10 @@ describe('Validator', () => {
             ];
 
             // act
-            const result = () => Validator.validateTreeInput(input);
+            const result = () => Validator.validateTreeBranches(input, []);
 
             // assert
-            expect(result).toThrowError('Detached branch detected for: 1');
+            expect(result).toThrowError('Detached branch detected for id: 1');
         });
-
-        // try to test Cyclical loop
     });
 });
