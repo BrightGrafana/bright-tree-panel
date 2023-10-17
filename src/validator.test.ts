@@ -49,15 +49,17 @@ describe('Validator', () => {
         it('should throw error if detached branch is found', () => {
             // arrange
             const input: RawNode[] = [
-                { id: '1', name: 'n1', parent: '2' },
-                { id: '2', name: 'n2', parent: '1' },
+                { id: '1', name: 'n1', parent: undefined },
+                { id: '2', name: 'n2', parent: '3' },
+                { id: '3', name: 'n3', parent: '2' },
             ];
 
             // act
-            const result = () => Validator.validateTreeBranches(input, []);
+            const result = () => Validator.validateTreeBranches(input, [
+                { id: '1', name: 'n1', parent: undefined, children: [] }]);
 
             // assert
-            expect(result).toThrowError('Detached branch detected for id: 1');
+            expect(result).toThrowError('Detached branch detected for id: 2');
         });
     });
 });

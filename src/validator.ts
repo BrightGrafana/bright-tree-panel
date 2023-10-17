@@ -47,6 +47,7 @@ export class Validator {
                 }
             });
         };
+        findNodeIds(tree);
 
         // find unused (detached) rawNodes
         rawNodes.forEach(node => {
