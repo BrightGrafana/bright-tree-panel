@@ -18,10 +18,10 @@ export class Validator {
 
         rawNodes.forEach((node: RawNode) => {
             if (nodeIds.has(node.id)) {
-                throw new ReferenceError(`Duplicated ID found for: ${node.id}`);
+                throw new ReferenceError(`Duplicated ID found for id: ${node.id}`);
             }
             if (node.id === node.parent) {
-                throw new ReferenceError(`Parent can not be mapped to it self. for: ${node.id}`);
+                throw new ReferenceError(`Parent can not be mapped to itself. For id: ${node.id}`);
             }
 
             nodeIds.add(node.id);

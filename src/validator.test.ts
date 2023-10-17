@@ -14,7 +14,7 @@ describe('Validator', () => {
             const result = () => Validator.validateTreeInput(input);
 
             // assert
-            expect(result).toThrowError('Duplicated ID found for: 1');
+            expect(result).toThrowError('Duplicated ID found for id: 1');
         });
 
         it('should throw error if ids are duplicated', () => {
@@ -42,7 +42,7 @@ describe('Validator', () => {
             const result = () => Validator.validateTreeInput(input);
 
             // assert
-            expect(result).toThrowError('Parent can not be mapped to it self. for: 2');
+            expect(result).toThrowError('Parent can not be mapped to itself. For id: 2');
         });
     });
     describe('validateTreeBranches', () => {
