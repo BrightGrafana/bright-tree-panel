@@ -42,7 +42,7 @@ export class Utils {
       values: field.values
         .toArray()
         .filter((value, index) =>
-          nodeIds.includes(queryResult.fields[nodeIdFieldIndex].values.get(index)?.toString() as string)
+          nodeIds.includes(`{queryResult.fields[nodeIdFieldIndex].values.get(index)}`)
         ),
     }));
 
@@ -77,10 +77,10 @@ export class Utils {
     const data = new DataFrameView(df).toArray();
 
     return data.map((dfRow) => ({
-      name: dfRow[labelColumn].toString(),
-      id: dfRow[idColumn].toString(),
-      parent: dfRow[parentColumn] != null ? dfRow[parentColumn].toString() : null,
-      children: [],
+      name: `${dfRow[labelColumn]}`,
+      id: `${dfRow[idColumn]}`,
+      parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : null,
+      children: [] as Node[],
     }));
   }
 
