@@ -42,7 +42,7 @@ export class Utils {
       values: field.values
         .toArray()
         .filter((value, index) =>
-          nodeIds.includes(`{queryResult.fields[nodeIdFieldIndex].values.get(index)}`)
+          nodeIds.includes(`${queryResult.fields[nodeIdFieldIndex].values.get(index)}`)
         ),
     }));
 
