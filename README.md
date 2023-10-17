@@ -1,6 +1,6 @@
 # Interactive Tree Plugin
 
-Welcome to the Interactive Tree Plugin, your solution for creating interactive Tree diagrams in Grafana 9.5+.
+Welcome to the Interactive Tree Plugin, your solution for creating interactive Tree diagrams in Grafana 10.0+.
 
 ![Plugin Demo](https://equansdatahub.azureedge.net/grafana-tree-panel/tree-usage-demo.gif)
 
@@ -29,7 +29,7 @@ When configuring the panel, you have several customization options at your dispo
 - **Show item count**: Toggle to display the count of first-level child nodes for nodes with children.
 - **Order in each level**: Sort nodes by name in ascending, descending, or custom order.
 - **Allow multi select using Ctrl-Click or Shift-Click**: Enable multiple node selection by holding the Ctrl or shift key.
-- **Node Click Behavior**: Define the action to perform when clicking on a tree node. Either set a dashboard variable or run a custom JS function
+- **Node click dashboard variable**: Define the dashboard variable to set when clicking a node or leaf.
 
 ![Plugin Options Demo](https://equansdatahub.azureedge.net/grafana-tree-panel/equans-grafana-tree-plugin-options-demo.gif)
 

@@ -1,14 +1,13 @@
 import { PanelData, PanelProps } from '@grafana/data';
-import { getTemplateSrv, locationService } from '@grafana/runtime';
+import { locationService } from '@grafana/runtime';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { ExpandMore, ChevronRight } from '@material-ui/icons';
 import React from 'react';
 import { Utils, Validator } from './';
-import { Node, PanelOptions, TreeLevelOrderMode, TreeClickEventControlMode, RawNode } from './models';
+import { Node, PanelOptions, TreeLevelOrderMode, RawNode } from './models';
 import './CSS/classes.css';
 
-// TODO: try and moe into the Tree function
-let treeDepth: number;
+let treeDepth = 0;
 
 function validateOptionsInput(options: PanelOptions, data: PanelData) {
   // Check for required panel options
@@ -29,10 +28,7 @@ function validateOptionsInput(options: PanelOptions, data: PanelData) {
     );
   }
 
-  if (
-    options.clickMode === TreeClickEventControlMode.Basic &&
-    (!options.dashboardVariableName || options.dashboardVariableName.trim() === '')
-  ) {
+  if (!options.dashboardVariableName || options.dashboardVariableName.trim() === '') {
     throw new ReferenceError(
       "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
     );
@@ -51,8 +47,6 @@ function validateOptionsInput(options: PanelOptions, data: PanelData) {
 
 export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   validateOptionsInput(options, data);
-
-  const customJsFn = new Function('data', 'locationService', 'getTemplateSrv', options.onClick);
 
   // Convert data to a Node array
   const queryResult: RawNode[] = React.useMemo(
@@ -127,14 +121,9 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
 
   // Handle node selection
   function setSelectedNodeId(event: React.ChangeEvent<any>, nodeIds: any): void {
-    if (options.clickMode === TreeClickEventControlMode.Basic) {
-      // SET a dashboard variable.
-      const nodeId = typeof nodeIds === 'number' ? [nodeIds] : nodeIds;
-      locationService.partial({ [`var-${options.dashboardVariableName}`]: nodeId }, true);
-    } else if (options.clickMode === TreeClickEventControlMode.Advanced) {
-      // use custom onClink handler
-      customJsFn(Utils.extractSelectedTreeNodes(data, nodeIds, options.idColumn), locationService, getTemplateSrv);
-    }
+    // SET a dashboard variable.
+    const nodeId = typeof nodeIds === 'number' ? [nodeIds] : nodeIds;
+    locationService.partial({ [`var-${options.dashboardVariableName}`]: nodeId }, true);
   }
 
   // Render TreeItem components recursively
