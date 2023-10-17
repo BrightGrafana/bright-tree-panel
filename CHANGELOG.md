@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.2.6](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.4...v1.2.6) (2023-10-17)
+
+
+### Bug Fixes
+
+* add automated release ([fef641b](https://github.com/BrightGrafana/bright-tree-panel/commit/fef641b45592307bc302a5c9793a0d3ab5eb63b0))
+
 ### [1.2.5](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.4...v1.2.5) (2023-10-17)
 
 ### [1.2.4](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.3...v1.2.4) (2023-10-17)
