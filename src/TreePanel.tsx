@@ -96,7 +96,7 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
       });
     }
 
-    return addChildNodes(
+    const newTree = addChildNodes(
       getRootNodes(
         queryResult.map((rawNode) => {
           const node: Node = { ...rawNode, children: [] };
@@ -104,6 +104,9 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
         })
       )
     );
+    Validator.validateTreeBranches(queryResult, newTree);
+
+    return newTree;
   }, [queryResult, options.orderLevels]);
 
   // Determine expanded nodes
