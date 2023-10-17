@@ -1,6 +1,6 @@
 export interface Node {
     id: string;
-    parent: string | null;
+    parent?: string;
     name: string;
     children: Node[];
 }
