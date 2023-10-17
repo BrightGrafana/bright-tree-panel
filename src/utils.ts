@@ -40,9 +40,8 @@ export class Utils {
     const modifiedFields: any[] = queryResult.fields.map((field) => ({
       ...field,
       values: field.values
-        .toArray()
         .filter((value, index) =>
-          nodeIds.includes(`${queryResult.fields[nodeIdFieldIndex].values.get(index)}`)
+          nodeIds.includes(`${queryResult.fields[nodeIdFieldIndex].values[index]}`)
         ),
     }));
 
@@ -61,6 +60,7 @@ export class Utils {
    * @returns {string[]} An array of column names.
    */
   static getDataFrameColumnNames(df: PanelData): string[] {
+    if (!df.series || !df.series[0] || !df.series[0].fields) return [];
     return df.series[0].fields.map((field) => field.name);
   }
 
@@ -92,6 +92,10 @@ export class Utils {
    * @returns {string[]} An array of node IDs that are expanded.
    */
   static getExpandedNodeIdsForDepth(tree: Node[], maxDepth: number): string[] {
+    if (!maxDepth || maxDepth < 0) throw new Error('maxDepth should be positive number');
+    if (!tree) return [];
+
+
     const traverse = (nodes: Node[], currentDepth: number): string[] => {
       const result: string[] = [];
 
