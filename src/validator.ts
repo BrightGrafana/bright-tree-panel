@@ -23,7 +23,7 @@ export class Validator {
          */
         function validateIds(node: Node): void {
             if (nodeIds.has(node.id)) {
-                throw new Error(`Duplicated ID found for: ${node.id}`);
+                throw new ReferenceError(`Duplicated ID found for: ${node.id}`);
             }
 
             nodeIds.add(node.id);
