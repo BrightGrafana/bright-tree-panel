@@ -50,7 +50,7 @@ describe('Utils', () => {
             } as unknown as PanelData;
 
             const result = Utils.extractSelectedTreeNodes(data, ['2', '4'], 'id');
-            console.log(result);
+
             expect(result).toEqual({
                 length: 2,
                 fields: [
@@ -100,7 +100,7 @@ describe('Utils', () => {
             const result = Utils.dfToNodeArray(new MutableDataFrame(data), 'id', 'parentId', 'label');
 
             expect(result).toEqual([
-                { name: 'Node 1', id: '1', parent: null, children: [] },
+                { name: 'Node 1', id: '1', parent: undefined, children: [] },
                 { name: 'Node 2', id: '2', parent: '1', children: [] },
             ]);
         });
@@ -115,7 +115,6 @@ describe('Utils', () => {
                         { id: '2', children: [], parent: 'n1', name: 'n2' },
                         { id: '3', children: [], parent: 'n1', name: 'n3' },
                     ],
-                    parent: null,
                     name: 'n1',
                 },
                 {
@@ -130,7 +129,6 @@ describe('Utils', () => {
                             name: 'n5',
                         },
                     ],
-                    parent: null,
                     name: 'n4',
                 },
             ];
