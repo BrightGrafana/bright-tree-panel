@@ -100,7 +100,7 @@ export class Utils {
       const result: string[] = [];
 
       for (const node of nodes) {
-        if (node.children.length === 0) {
+        if ((node.children || []).length === 0) {
           continue;
         }
 
@@ -108,7 +108,7 @@ export class Utils {
           result.push(node.id);
         }
         if (currentDepth + 1 < maxDepth) {
-          result.push(...traverse(node.children, currentDepth + 1));
+          result.push(...traverse((node.children || []), currentDepth + 1));
         }
       }
 

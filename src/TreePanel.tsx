@@ -3,7 +3,7 @@ import { getTemplateSrv, locationService } from '@grafana/runtime';
 import { TreeView, TreeItem } from '@material-ui/lab';
 import { ExpandMore, ChevronRight } from '@material-ui/icons';
 import React from 'react';
-import { Utils } from './utils';
+import { Utils, Validator } from './';
 import { Node, PanelOptions, TreeLevelOrderMode, TreeClickEventControlMode } from './models';
 import './CSS/classes.css';
 
@@ -89,7 +89,10 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
       });
     }
 
-    return addChildNodes(getRootNodes(queryResult));
+    const newTree = addChildNodes(getRootNodes(queryResult));
+    Validator.validateTreeInput(newTree);
+
+    return newTree;
   }, [queryResult, options.orderLevels]);
 
   // Determine expanded nodes
@@ -122,13 +125,13 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
 
   // Render TreeItem components recursively
   function renderTreeItem(node: Node) {
-    if (node.children.length !== 0) {
+    if ((node.children || []).length !== 0) {
       // add item count if needed to name
       const label = `${node.name}${options.showItemCount ? ` (${(node.children || []).length})` : ''}`;
 
       return (
         <TreeItem nodeId={node.id} label={label} custom-type="branch">
-          {node.children.map((child: Node) => renderTreeItem(child))}
+          {(node.children || []).map((child: Node) => renderTreeItem(child))}
         </TreeItem>
       );
     }

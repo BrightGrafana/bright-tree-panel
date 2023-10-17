@@ -20,6 +20,7 @@ describe('Validator', () => {
         it('should throw error if ids are duplicated in child nodes', () => {
             // arrange
             const input: Node[] = [
+                { id: '0', name: 'n0' },
                 { id: '1', name: 'n1', children: [{ id: '1', name: 'n1', children: [] }] },
             ];
 
