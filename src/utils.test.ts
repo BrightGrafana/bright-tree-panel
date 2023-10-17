@@ -1,32 +1,39 @@
-import { PanelData, DataFrameDTO, FieldType, MutableDataFrame } from '@grafana/data';
+import { PanelData, DataFrameDTO, FieldType, MutableDataFrame, DataFrame } from '@grafana/data';
 import { Utils } from './utils';
-import { Node } from './models'
+import { Node } from './models';
 
 describe('Utils', () => {
     describe('extractSelectedTreeNodes', () => {
         it('should throw an error when data is not supplied', () => {
-            expect(() => Utils.extractSelectedTreeNodes(undefined, [], 'id')).toThrowError('data: PanelData was not supplied when clicking on tree node.');
+            expect(() => Utils.extractSelectedTreeNodes(undefined as any as PanelData, [], 'id')).toThrowError(
+                'data: PanelData was not supplied when clicking on tree node.'
+            );
         });
 
         it('should throw an error when nodeIds are not supplied', () => {
-            expect(() => Utils.extractSelectedTreeNodes({} as PanelData, undefined, 'id')).toThrowError('Ids of clicked nodes were not supplied when clicking on tree nodes.');
+            expect(() => Utils.extractSelectedTreeNodes({} as PanelData, undefined as any as string[], 'id')).toThrowError(
+                'Ids of clicked nodes were not supplied when clicking on tree nodes.'
+            );
         });
 
         it('should throw an error when idColumn is not supplied', () => {
-            expect(() => Utils.extractSelectedTreeNodes({} as PanelData, ['nodeId'], undefined)).toThrowError('Column name with node ids was not supplied when clicking tree nodes.');
+            expect(() =>
+                Utils.extractSelectedTreeNodes({} as PanelData, ['nodeId'], undefined as any as string)
+            ).toThrowError('Column name with node ids was not supplied when clicking tree nodes.');
         });
 
         it('should throw an error when the idColumn is not found in the query result', () => {
             const data: PanelData = {
                 series: [
                     {
-                        fields: [
-                            { name: 'anotherColumn', values: [] },
-                        ],
+                        fields: [{ name: 'anotherColumn', values: [], type: FieldType.string, config: {} }],
+                        length: 1,
                     },
                 ],
-            };
-            expect(() => Utils.extractSelectedTreeNodes(data, ['nodeId'], 'testId')).toThrowError("Column 'testId' not found in the query result.");
+            } as unknown as PanelData;
+            expect(() => Utils.extractSelectedTreeNodes(data, ['nodeId'], 'testId')).toThrowError(
+                "Column 'testId' not found in the query result."
+            );
         });
 
         it('should return a modified DataFrame with selected rows', () => {
@@ -34,20 +41,21 @@ describe('Utils', () => {
                 series: [
                     {
                         fields: [
-                            { name: 'id', values: [1, 2, 3, 4] },
-                            { name: 'otherColumn', values: ['A', 'B', 'C', 'D'] },
+                            { name: 'id', values: [1, 2, 3, 4], type: FieldType.number, config: {} },
+                            { name: 'otherColumn', values: ['A', 'B', 'C', 'D'], type: FieldType.string, config: {} },
                         ],
+                        length: 2,
                     },
                 ],
-            };
+            } as unknown as PanelData;
 
             const result = Utils.extractSelectedTreeNodes(data, ['2', '4'], 'id');
             console.log(result);
             expect(result).toEqual({
                 length: 2,
                 fields: [
-                    { name: 'id', values: [2, 4] },
-                    { name: 'otherColumn', values: ['B', 'D'] },
+                    { name: 'id', values: [2, 4], type: FieldType.number, config: {} },
+                    { name: 'otherColumn', values: ['B', 'D'], type: FieldType.string, config: {} },
                 ],
             });
         });
@@ -59,21 +67,21 @@ describe('Utils', () => {
                 series: [
                     {
                         fields: [
-                            { name: 'column1', values: [] },
-                            { name: 'column2', values: [] },
-                            { name: 'column3', values: [] },
+                            { name: 'column1', values: [], type: FieldType.string, config: {} },
+                            { name: 'column2', values: [], type: FieldType.string, config: {} },
+                            { name: 'column3', values: [], type: FieldType.string, config: {} },
                         ],
                     },
                 ],
-            };
+            } as unknown as PanelData;
             const result = Utils.getDataFrameColumnNames(data);
             expect(result).toEqual(['column1', 'column2', 'column3']);
         });
 
         it('should handle an empty DataFrame', () => {
             const data: PanelData = {
-                series: [],
-            };
+                series: [] as DataFrame[],
+            } as PanelData;
             const result = Utils.getDataFrameColumnNames(data);
             expect(result).toEqual([]);
         });
@@ -101,8 +109,30 @@ describe('Utils', () => {
     describe('getExpandedNodeIdsForDepth', () => {
         it('should return an array of expanded node IDs up to a specified depth', () => {
             const tree: Node[] = [
-                { id: '1', children: [{ id: '2', children: [], parent: 'n1', name: 'n2' }, { id: '3', children: [], parent: 'n1', name: 'n3' }], parent: null, name: 'n1' },
-                { id: '4', children: [{ id: '5', children: [{ id: '6', children: [{ id: '7', children: [], parent: 'n6', name: 'n7' }], parent: 'n5', name: 'n6' }], parent: 'n4', name: 'n5' }], parent: null, name: 'n4' },
+                {
+                    id: '1',
+                    children: [
+                        { id: '2', children: [], parent: 'n1', name: 'n2' },
+                        { id: '3', children: [], parent: 'n1', name: 'n3' },
+                    ],
+                    parent: null,
+                    name: 'n1',
+                },
+                {
+                    id: '4',
+                    children: [
+                        {
+                            id: '5',
+                            children: [
+                                { id: '6', children: [{ id: '7', children: [], parent: 'n6', name: 'n7' }], parent: 'n5', name: 'n6' },
+                            ],
+                            parent: 'n4',
+                            name: 'n5',
+                        },
+                    ],
+                    parent: null,
+                    name: 'n4',
+                },
             ];
             const result = Utils.getExpandedNodeIdsForDepth(tree, 2);
             expect(result).toEqual(['1', '4', '5']);
@@ -114,7 +144,7 @@ describe('Utils', () => {
         });
 
         it('should handle an undefined tree', () => {
-            const result = Utils.getExpandedNodeIdsForDepth(undefined, 2);
+            const result = Utils.getExpandedNodeIdsForDepth(undefined as any as Node[], 2);
             expect(result).toEqual([]);
         });
 
@@ -123,8 +153,9 @@ describe('Utils', () => {
         });
 
         it('should throw an error when max depth undefined', () => {
-            expect(() => Utils.getExpandedNodeIdsForDepth([], undefined)).toThrowError('maxDepth should be positive number');
+            expect(() => Utils.getExpandedNodeIdsForDepth([], undefined as any as number)).toThrowError(
+                'maxDepth should be positive number'
+            );
         });
-
     });
 });
