@@ -30,11 +30,49 @@ describe('Validator', () => {
             // assert
             expect(result).toThrowError('Duplicated ID found for: 1');
         });
+
+        it('should throw error if ids are duplicated', () => {
+            // arrange
+            const input: Node[] = [
+                { id: '1', name: 'n1', children: [] },
+                { id: '2', name: 'n2', children: [], parent: '3' },
+            ];
+
+            // act
+            const result = () => Validator.validateTreeInput(input);
+
+            // assert
+            expect(result).toThrowError('Parent not found for id 2 parent 3');
+        });
+
+        it('should throw error if parent matches id', () => {
+            // arrange
+            const input: Node[] = [
+                { id: '1', name: 'n1', children: [] },
+                { id: '2', name: 'n2', children: [], parent: '2' },
+            ];
+
+            // act
+            const result = () => Validator.validateTreeInput(input);
+
+            // assert
+            expect(result).toThrowError('Parent can not be mapped to it self. for: 2');
+        });
+
+        xit('should throw error if detached branch is found', () => {
+            // arrange
+            const input: Node[] = [
+                { id: '1', name: 'n1', children: [], parent: '2' },
+                { id: '2', name: 'n2', children: [], parent: '1' },
+            ];
+
+            // act
+            const result = () => Validator.validateTreeInput(input);
+
+            // assert
+            expect(result).toThrowError('Detached branch detected for: 1');
+        });
+
+        // try to test Cyclical loop
     });
 });
-// id, label, parent
-// 1, n1,
-// 2, n2, 1
-// 3, , 1
-// 3, , 1
-// 4, n4n,3

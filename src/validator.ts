@@ -25,6 +25,9 @@ export class Validator {
             if (nodeIds.has(node.id)) {
                 throw new ReferenceError(`Duplicated ID found for: ${node.id}`);
             }
+            if (node.id === node.parent) {
+                throw new ReferenceError(`Parent can not be mapped to it self. for: ${node.id}`);
+            }
 
             nodeIds.add(node.id);
 
@@ -34,5 +37,14 @@ export class Validator {
         }
 
         tree.forEach(validateIds);
+
+        // list of all ID's is build
+
+        function validateParents(node: Node): void {
+            if (node.parent && !nodeIds.has(node.parent)) {
+                throw new ReferenceError(`Parent not found for id ${node.id} parent ${node.parent}`);
+            }
+        }
+        tree.forEach(validateParents);
     }
 }
