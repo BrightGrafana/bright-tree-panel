@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.2.0](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.1.0...v1.2.0) (2023-10-17)
+
+
+### Features
+
+* remove onClick handler to be more sandboxed ([b5209bb](https://github.com/BrightGrafana/bright-tree-panel/commit/b5209bb5253426b4b04471eb93b11055dc40c1ea))
+
 ## 1.1.0 (2023-10-17)
 
 ### Features
