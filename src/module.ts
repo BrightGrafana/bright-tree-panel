@@ -1,10 +1,6 @@
 import { PanelPlugin } from '@grafana/data';
 import { Tree } from './TreePanel';
 import { PanelOptions, TreeLevelOrderMode } from 'models';
-import { PanelOptionCode } from 'PanelOptionCode';
-import { TreeClickEventControlMode } from 'models/tree-click-event-control-mode';
-
-const isOnClickMode = (mode: PanelOptions['onClick']) => (config: any) => config.clickMode === mode;
 
 export const plugin = new PanelPlugin<PanelOptions>(Tree).setPanelOptions((builder) => {
   return builder
@@ -54,37 +50,10 @@ export const plugin = new PanelPlugin<PanelOptions>(Tree).setPanelOptions((build
       name: 'Allow multi select using Ctrl-Click or Shift-Click.',
       defaultValue: true,
     })
-    .addRadio({
-      path: 'clickMode',
-      name: 'Select type of clicking control',
-      defaultValue: TreeClickEventControlMode.Basic,
-      settings: {
-        options: [
-          { value: TreeClickEventControlMode.Basic, label: 'Set dashboard variable' },
-          { value: TreeClickEventControlMode.Advanced, label: 'Advanced' },
-        ],
-      },
-    })
     .addTextInput({
       path: 'dashboardVariableName',
       name: 'Dashboard variable name',
       description: 'Name of the dashboard variable in which the id of the clicked node(s) is/are stored.',
       defaultValue: 'Placeholder',
-      showIf: isOnClickMode(TreeClickEventControlMode.Basic),
-    })
-    .addCustomEditor({
-      id: 'onClick',
-      path: 'onClick',
-      name: 'On-click Trigger',
-      description: `
-        Script executed when Tree node(s) are clicked.
-        \`f(data,locationService, getTemplateSrv){...}\``,
-      editor: PanelOptionCode,
-      settings: {
-        language: 'javascript',
-      },
-      defaultValue: `// console.log(data, locationService, getTemplateSrv);
-      // window.updateVariables({query:{'var-project':'test'}, partial: true})`,
-      showIf: isOnClickMode(TreeClickEventControlMode.Advanced),
     });
 });

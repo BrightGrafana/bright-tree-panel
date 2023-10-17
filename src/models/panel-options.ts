@@ -1,4 +1,4 @@
-import { TreeClickEventControlMode, TreeLevelOrderMode } from "./";
+import { TreeLevelOrderMode } from "./";
 
 export interface PanelOptions {
     multiSelect: boolean;
@@ -8,7 +8,5 @@ export interface PanelOptions {
     parentIdColumn: string;
     displayedTreeDepth: number;
     showItemCount: boolean;
-    clickMode: TreeClickEventControlMode;
     dashboardVariableName: string;
-    onClick: string;
 }
