@@ -16,13 +16,13 @@ export class Utils {
    */
   static extractSelectedTreeNodes(data: PanelData, nodeIds: string[], idColumn: PanelOptions['idColumn']): DataFrame {
     if (data === undefined) {
-      throw new Error('data: PanelData was not supplied when clicking on tree node.');
+      throw new ReferenceError('data: PanelData was not supplied when clicking on tree node.');
     }
     if (nodeIds === undefined) {
-      throw new Error('Ids of clicked nodes were not supplied when clicking on tree nodes.');
+      throw new ReferenceError('Ids of clicked nodes were not supplied when clicking on tree nodes.');
     }
     if (idColumn === undefined) {
-      throw new Error('Column name with node ids was not supplied when clicking tree nodes.');
+      throw new ReferenceError('Column name with node ids was not supplied when clicking tree nodes.');
     }
 
     const queryResult: DataFrame = data.series[0] as DataFrame;
@@ -30,7 +30,7 @@ export class Utils {
     const nodeIdFieldIndex = queryResult.fields.findIndex((field) => field.name === idColumn);
 
     if (nodeIdFieldIndex === -1) {
-      throw new Error(`Column '${idColumn}' not found in the query result.`);
+      throw new ReferenceError(`Column '${idColumn}' not found in the query result.`);
     }
 
     const modifiedFields: any[] = queryResult.fields.map((field) => ({
@@ -90,7 +90,7 @@ export class Utils {
    */
   static getExpandedNodeIdsForDepth(tree: Node[], maxDepth: number): string[] {
     if (!maxDepth || maxDepth < 0) {
-      throw new Error('maxDepth should be positive number');
+      throw new ReferenceError('maxDepth should be positive number');
     }
     if (!tree) {
       return [];

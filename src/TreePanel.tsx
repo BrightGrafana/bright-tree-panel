@@ -13,7 +13,7 @@ let treeDepth: number;
 function validateOptionsInput(options: PanelOptions, data: PanelData) {
   // Check for required panel options
   if (options.displayedTreeDepth === undefined || options.displayedTreeDepth < 0) {
-    throw new Error("'Expanded levels' must be defined and >= 0 in panel options.");
+    throw new ReferenceError("'Expanded levels' must be defined and >= 0 in panel options.");
   }
 
   if (
@@ -44,7 +44,7 @@ function validateOptionsInput(options: PanelOptions, data: PanelData) {
 
   for (const colName of requiredColumns) {
     if (!colNames.includes(colName)) {
-      throw new Error(`'${colName}' is not a table column.`);
+      throw new ReferenceError(`'${colName}' is not a table column.`);
     }
   }
 }
@@ -63,7 +63,7 @@ export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   // Build the tree hierarchy
   const tree: Node[] = React.useMemo(() => {
     function getRootNodes(data: Node[]): Node[] {
-      return data.filter((row) => row.parent === null);
+      return data.filter((row) => !row.parent);
     }
 
     function getChildrenOfNode(node: Node): Node[] {
