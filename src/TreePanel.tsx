@@ -7,6 +7,8 @@ import { Utils, Validator } from './';
 import { Node, PanelOptions, TreeLevelOrderMode, RawNode } from './models';
 import './CSS/classes.css';
 
+let treeDepth = 0;
+
 function validateOptionsInput(options: PanelOptions, data: PanelData) {
   // Check for required panel options
   if (options.displayedTreeDepth === undefined || options.displayedTreeDepth < 0) {
@@ -45,7 +47,6 @@ function validateOptionsInput(options: PanelOptions, data: PanelData) {
 
 export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   validateOptionsInput(options, data);
-  let treeDepth = 0;
 
   // Convert data to a Node array
   const queryResult: RawNode[] = React.useMemo(
