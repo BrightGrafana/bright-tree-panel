@@ -61,7 +61,7 @@ jobs:
       - name: Sign plugin
         id: sign-plugin
         env:
-          GRAFANA_API_KEY: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }} # Requires a Grafana API key from Grafana.com.
+          GRAFANA_ACCESS_POLICY_TOKEN: ${{ secrets.GRAFANA_ACCESS_POLICY_TOKEN }} # Requires a Grafana API key from Grafana.com.
         run: npx @grafana/sign-plugin@latest
 
       - name: Package plugin
