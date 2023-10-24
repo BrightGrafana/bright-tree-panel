@@ -1,22 +1,22 @@
-import { buildTree, getPath } from "./TreeBuilder";
-import { RawNode, Node, TreeLevelOrderMode } from "./models";
+import { buildTree, getPath } from './TreeBuilder';
+import { RawNode, Node, TreeLevelOrderMode } from './models';
 
-describe("TreeBuilder", () => {
-    describe("buildTree function", () => {
-        it("should build a tree in ascending order", () => {
+describe('TreeBuilder', () => {
+    describe('buildTree function', () => {
+        it('should build a tree in ascending order', () => {
             const rawNodes: RawNode[] = [
-                { id: "1", name: "C" },
-                { id: "2", parent: "1", name: "A" },
-                { id: "3", parent: "1", name: "B" },
+                { id: '1', name: 'C' },
+                { id: '2', parent: '1', name: 'A' },
+                { id: '3', parent: '1', name: 'B' },
             ];
 
             const expectedTree: Node[] = [
                 {
-                    id: "1",
-                    name: "C",
+                    id: '1',
+                    name: 'C',
                     children: [
-                        { id: "2", parent: "1", name: "A", children: [] },
-                        { id: "3", parent: "1", name: "B", children: [] },
+                        { id: '2', parent: '1', name: 'A', children: [] },
+                        { id: '3', parent: '1', name: 'B', children: [] },
                     ],
                 },
             ];
@@ -25,20 +25,20 @@ describe("TreeBuilder", () => {
             expect(result).toEqual(expectedTree);
         });
 
-        it("should build a tree in descending order", () => {
+        it('should build a tree in descending order', () => {
             const rawNodes: RawNode[] = [
-                { id: "1", name: "A" },
-                { id: "2", parent: "1", name: "C" },
-                { id: "3", parent: "1", name: "B" },
+                { id: '1', name: 'A' },
+                { id: '2', parent: '1', name: 'C' },
+                { id: '3', parent: '1', name: 'B' },
             ];
 
             const expectedTree: Node[] = [
                 {
-                    id: "1",
-                    name: "A",
+                    id: '1',
+                    name: 'A',
                     children: [
-                        { id: "2", parent: "1", name: "C", children: [] },
-                        { id: "3", parent: "1", name: "B", children: [] },
+                        { id: '2', parent: '1', name: 'C', children: [] },
+                        { id: '3', parent: '1', name: 'B', children: [] },
                     ],
                 },
             ];
@@ -47,20 +47,20 @@ describe("TreeBuilder", () => {
             expect(result).toEqual(expectedTree);
         });
 
-        it("should build a tree with no sorting when TreeLevelOrderMode is None", () => {
+        it('should build a tree with no sorting when TreeLevelOrderMode is None', () => {
             const rawNodes: RawNode[] = [
-                { id: "1", name: "C" },
-                { id: "2", parent: "1", name: "A" },
-                { id: "3", parent: "1", name: "B" },
+                { id: '1', name: 'C' },
+                { id: '2', parent: '1', name: 'A' },
+                { id: '3', parent: '1', name: 'B' },
             ];
 
             const expectedTree: Node[] = [
                 {
-                    id: "1",
-                    name: "C",
+                    id: '1',
+                    name: 'C',
                     children: [
-                        { id: "2", parent: "1", name: "A", children: [] },
-                        { id: "3", parent: "1", name: "B", children: [] },
+                        { id: '2', parent: '1', name: 'A', children: [] },
+                        { id: '3', parent: '1', name: 'B', children: [] },
                     ],
                 },
             ];
@@ -69,26 +69,26 @@ describe("TreeBuilder", () => {
             expect(result).toEqual(expectedTree);
         });
 
-        it("should handle a tree with multiple root nodes", () => {
+        it('should handle a tree with multiple root nodes', () => {
             const rawNodes: RawNode[] = [
-                { id: "1", name: "C" },
-                { id: "2", parent: "1", name: "A" },
-                { id: "3", parent: "1", name: "B" },
-                { id: "4", name: "X" },
-                { id: "5", name: "Y" },
+                { id: '1', name: 'C' },
+                { id: '2', parent: '1', name: 'A' },
+                { id: '3', parent: '1', name: 'B' },
+                { id: '4', name: 'X' },
+                { id: '5', name: 'Y' },
             ];
 
             const expectedTree: Node[] = [
                 {
-                    id: "1",
-                    name: "C",
+                    id: '1',
+                    name: 'C',
                     children: [
-                        { id: "2", parent: "1", name: "A", children: [] },
-                        { id: "3", parent: "1", name: "B", children: [] },
+                        { id: '2', parent: '1', name: 'A', children: [] },
+                        { id: '3', parent: '1', name: 'B', children: [] },
                     ],
                 },
-                { id: "4", name: "X", children: [] },
-                { id: "5", name: "Y", children: [] },
+                { id: '4', name: 'X', children: [] },
+                { id: '5', name: 'Y', children: [] },
             ];
 
             const result = buildTree(rawNodes, TreeLevelOrderMode.Source);
@@ -115,7 +115,6 @@ describe("TreeBuilder", () => {
             const expectedPath = ['A', 'B', 'C'];
             expect(getPath(sampleRawNodes, leafNode)).toEqual(expectedPath);
         });
-
 
         it('should handle multiple leaf nodes with the same ID by returning the path for the first occurrence', () => {
             const leafNode = sampleRawNodes.find((node) => node.id === 'E') as RawNode;
