@@ -1,8 +1,8 @@
 import { PanelPlugin } from '@grafana/data';
-import { Tree } from './TreePanel';
-import { PanelOptions, TreeLevelOrderMode } from 'models';
+import { TreePanel } from './TreePanel';
+import { PanelOptions, TreeLevelOrderMode } from './models';
 
-export const plugin = new PanelPlugin<PanelOptions>(Tree).setPanelOptions((builder) => {
+export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((builder) => {
   return builder
     .addTextInput({
       path: 'idColumn',

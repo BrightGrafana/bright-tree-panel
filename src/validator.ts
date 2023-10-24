@@ -1,4 +1,6 @@
-import { RawNode, Node } from './models';
+import { PanelData } from '@grafana/data';
+import { RawNode, Node, PanelOptions } from './models';
+import { Utils } from './utils';
 
 /**
  * A utility class for validating a tree structure represented by an array of nodes.
@@ -50,10 +52,46 @@ export class Validator {
         findNodeIds(tree);
 
         // find unused (detached) rawNodes
-        rawNodes.forEach(node => {
+        rawNodes.forEach((node) => {
             if (!treeNodes.includes(node.id)) {
-                throw new ReferenceError(`Detached branch detected for id: ${node.id}`)
+                throw new ReferenceError(`Detached branch detected for id: ${node.id}`);
             }
-        })
+        });
+    }
+
+    public static validateOptionsInput(options: PanelOptions, data: PanelData): void {
+        // Check for required panel options
+        if (options.displayedTreeDepth === undefined || options.displayedTreeDepth < 0) {
+            throw new ReferenceError("'Expanded levels' must be defined and >= 0 in panel options.");
+        }
+
+        if (
+            !options.idColumn ||
+            !options.labelColumn ||
+            !options.parentIdColumn ||
+            options.idColumn.trim() === '' ||
+            options.labelColumn.trim() === '' ||
+            options.parentIdColumn.trim() === ''
+        ) {
+            throw new ReferenceError(
+                "'Node id field name', 'Node label field name', and 'Node parent id field name' must be defined in panel options."
+            );
+        }
+
+        if (!options.dashboardVariableName || options.dashboardVariableName.trim() === '') {
+            throw new ReferenceError(
+                "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+            );
+        }
+
+        // Validate column names
+        const colNames = Utils.getDataFrameColumnNames(data);
+        const requiredColumns = [options.idColumn, options.labelColumn, options.parentIdColumn];
+
+        for (const colName of requiredColumns) {
+            if (!colNames.includes(colName)) {
+                throw new ReferenceError(`'${colName}' is not a table column.`);
+            }
+        }
     }
 }

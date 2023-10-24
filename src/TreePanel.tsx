@@ -1,159 +1,115 @@
-import { PanelData, PanelProps } from '@grafana/data';
-import { locationService } from '@grafana/runtime';
 import { TreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ExpandMore, ChevronRight } from '@mui/icons-material';
 import React from 'react';
-import { Utils, Validator } from './';
-import { Node, PanelOptions, TreeLevelOrderMode, RawNode } from './models';
-import './CSS/classes.css';
+import { PanelProps } from '@grafana/data';
+import { Node, PanelOptions, RawNode } from './models';
+import { buildTree, getPath } from './TreeBuilder';
+import { Utils } from './utils';
+import { Validator } from './validator';
+import { locationService } from '@grafana/runtime';
 
-let treeDepth = 0;
-
-function validateOptionsInput(options: PanelOptions, data: PanelData) {
-  // Check for required panel options
-  if (options.displayedTreeDepth === undefined || options.displayedTreeDepth < 0) {
-    throw new ReferenceError("'Expanded levels' must be defined and >= 0 in panel options.");
-  }
-
-  if (
-    !options.idColumn ||
-    !options.labelColumn ||
-    !options.parentIdColumn ||
-    options.idColumn.trim() === '' ||
-    options.labelColumn.trim() === '' ||
-    options.parentIdColumn.trim() === ''
-  ) {
-    throw new ReferenceError(
-      "'Node id field name', 'Node label field name', and 'Node parent id field name' must be defined in panel options."
-    );
-  }
-
-  if (!options.dashboardVariableName || options.dashboardVariableName.trim() === '') {
-    throw new ReferenceError(
-      "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
-    );
-  }
-
-  // Validate column names
-  const colNames = Utils.getDataFrameColumnNames(data);
-  const requiredColumns = [options.idColumn, options.labelColumn, options.parentIdColumn];
-
-  for (const colName of requiredColumns) {
-    if (!colNames.includes(colName)) {
-      throw new ReferenceError(`'${colName}' is not a table column.`);
-    }
-  }
-}
-
-export const Tree: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
-  validateOptionsInput(options, data);
+export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
+  // validate options input before anything else
+  Validator.validateOptionsInput(options, data);
 
   // Convert data to a Node array
   const queryResult: RawNode[] = React.useMemo(
     () => Utils.dfToNodeArray(data.series[0], options.idColumn, options.parentIdColumn, options.labelColumn),
     [data, options.idColumn, options.parentIdColumn, options.labelColumn]
   );
-
   Validator.validateTreeInput(queryResult);
 
-  // Build the tree hierarchy
-  const tree: Node[] = React.useMemo(() => {
-    function getRootNodes(data: Node[]): Node[] {
-      return data.filter((row) => !row.parent);
-    }
-
-    function getChildrenOfNode(node: Node): Node[] {
-      return queryResult
-        .filter((row) => row.parent === node.id)
-        .map((rawNode) => {
-          const node: Node = { ...rawNode, children: [] };
-          return node;
-        });
-    }
-
-    function addChildNodes(rootNodes: Node[]): Node[] {
-      if (options.orderLevels === TreeLevelOrderMode.Asc) {
-        rootNodes.sort((a, b) => a.name.localeCompare(b.name));
-      } else if (options.orderLevels === TreeLevelOrderMode.Desc) {
-        rootNodes.sort((a, b) => b.name.localeCompare(a.name));
-      }
-
-      return rootNodes.map((rootNode: Node) => {
-        const childNodes = getChildrenOfNode(rootNode);
-        if (childNodes.length === 0) {
-          return rootNode;
-        }
-        addChildNodes(childNodes);
-        rootNode.children = childNodes;
-
-        return rootNode;
-      });
-    }
-
-    const newTree = addChildNodes(
-      getRootNodes(
-        queryResult.map((rawNode) => {
-          const node: Node = { ...rawNode, children: [] };
-          return node;
-        })
-      )
-    );
-    Validator.validateTreeBranches(queryResult, newTree);
-
-    return newTree;
-  }, [queryResult, options.orderLevels]);
+  // buildTree
+  const tree: Node[] = React.useMemo(
+    () => buildTree(queryResult, options.orderLevels),
+    [queryResult, options.orderLevels]
+  );
 
   // Determine expanded nodes
   const expandedNodeIds: string[] = React.useMemo(
     () => Utils.getExpandedNodeIdsForDepth(tree, options.displayedTreeDepth),
     [tree, options]
   );
+
   const [expanded, setExpanded] = React.useState<string[]>(expandedNodeIds);
+  const [selected, setSelected] = React.useState<string[]>([]);
+  const [treeDepth, setTreeDepth] = React.useState<number>(options.displayedTreeDepth);
 
   // Update expanded nodes when depth changes
   if (treeDepth !== options.displayedTreeDepth) {
-    treeDepth = options.displayedTreeDepth;
+    setTreeDepth(options.displayedTreeDepth);
     setExpanded(expandedNodeIds);
   }
 
-  // Handle node toggle
-  const handleToggle = (event: React.ChangeEvent<any>, nodeIds: string[]) => setExpanded(nodeIds);
+  const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    setExpanded(nodeIds);
+  };
 
-  // Handle node selection
-  function setSelectedNodeId(event: React.ChangeEvent<any>, nodeIds: any): void {
+  const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    setSelected(nodeIds);
     // SET a dashboard variable.
     const nodeId = typeof nodeIds === 'number' ? [nodeIds] : nodeIds;
     locationService.partial({ [`var-${options.dashboardVariableName}`]: nodeId }, true);
-  }
+  };
 
-  // Render TreeItem components recursively
-  function renderTreeItem(node: Node) {
-    if ((node.children || []).length !== 0) {
-      // add item count if needed to name
-      const label = `${node.name}${options.showItemCount ? ` (${(node.children || []).length})` : ''}`;
-
-      return (
-        <TreeItem nodeId={node.id} label={label} custom-type="branch">
-          {(node.children || []).map((child: Node) => renderTreeItem(child))}
-        </TreeItem>
-      );
+  const getProvidedNodes = (dashboardVariableName: string): string[] => {
+    const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
+    if (!input) {
+      return [];
+    }
+    if (!Array.isArray(input)) {
+      return [`${input}`];
     }
 
-    return <TreeItem nodeId={node.id} label={node.name} custom-type="leaf" />;
+    return input as string[];
+  };
+
+  // set selected based on url
+  const providedNodes = getProvidedNodes(options.dashboardVariableName);
+  if (JSON.stringify(providedNodes) !== JSON.stringify(selected)) {
+    const extraExpansions: string[] = [];
+    providedNodes.forEach((selectedNodeId: string) => {
+      getPath(queryResult, queryResult.find((node) => node.id === selectedNodeId) as RawNode).forEach((nodeId) => {
+        if (!expanded.includes(nodeId) && !extraExpansions.includes(nodeId)) {
+          extraExpansions.push(nodeId);
+        }
+      });
+    });
+
+    setExpanded([...expanded, ...extraExpansions]);
+    setSelected(providedNodes);
   }
+
+  const renderTree = (nodes: Node[]) => {
+    return nodes.map((node: Node) => {
+      return (
+        <TreeItem
+          key={node.id}
+          nodeId={node.id}
+          label={`${node.name}${
+            (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
+          }`}
+        >
+          {Array.isArray(node.children) ? renderTree(node.children) : null}
+        </TreeItem>
+      );
+    });
+  };
 
   return (
     <div className="treeView">
       <TreeView
+        aria-label="controlled"
         defaultCollapseIcon={<ExpandMore />}
         defaultExpandIcon={<ChevronRight />}
-        onNodeToggle={handleToggle}
-        onNodeSelect={setSelectedNodeId}
-        multiSelect={options.multiSelect}
         expanded={expanded}
+        selected={selected}
+        onNodeToggle={handleToggle}
+        onNodeSelect={handleSelect}
+        multiSelect={options.multiSelect ? true : undefined}
       >
-        {tree.map((node: Node) => renderTreeItem(node))}
+        {renderTree(tree)}
       </TreeView>
     </div>
   );
