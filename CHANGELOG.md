@@ -2,6 +2,18 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.3.0](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.7...v1.3.0) (2023-10-24)
+
+
+### Features
+
+* Select nodes based on dashboard variable ([7f7b090](https://github.com/BrightGrafana/bright-tree-panel/commit/7f7b090f64035979ce79cfddfe776f6876dff661))
+
+
+### Bug Fixes
+
+* remove tree-click-event-control-mode ([578d391](https://github.com/BrightGrafana/bright-tree-panel/commit/578d3913f5bfbe751adaceffb08c7f85086c21bc))
+
 ### [1.2.7](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.6...v1.2.7) (2023-10-19)
 
 ### Bug Fixes
