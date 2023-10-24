@@ -1,7 +1,8 @@
 import { PanelData, PanelProps } from '@grafana/data';
 import { locationService } from '@grafana/runtime';
-import { TreeView, TreeItem } from '@material-ui/lab';
-import { ExpandMore, ChevronRight } from '@material-ui/icons';
+import { TreeView } from '@mui/x-tree-view/TreeView';
+import { TreeItem } from '@mui/x-tree-view/TreeItem';
+import { ExpandMore, ChevronRight } from '@mui/icons-material';
 import React from 'react';
 import { Utils, Validator } from './';
 import { Node, PanelOptions, TreeLevelOrderMode, RawNode } from './models';

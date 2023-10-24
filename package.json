@@ -1,6 +1,6 @@
 {
   "name": "tree",
-  "version": "1.2.7",
+  "version": "1.2.6",
   "description": "View data as tree",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
@@ -60,9 +60,9 @@
     "@grafana/data": "^10.1.5",
     "@grafana/runtime": "^10.1.5",
     "@grafana/ui": "^10.1.5",
-    "@material-ui/core": "^4.11.3",
-    "@material-ui/icons": "^4.11.3",
-    "@material-ui/lab": "^4.0.0-alpha.61",
+    "@mui/icons-material": "^5.14.14",
+    "@mui/material": "^5.14.14",
+    "@mui/x-tree-view": "^6.0.0-beta.0",
     "js-yaml": "^4.1.0",
     "react": "17.0.2",
     "react-dom": "17.0.2",
