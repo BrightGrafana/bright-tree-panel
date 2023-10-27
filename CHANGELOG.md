@@ -2,6 +2,13 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+### [1.3.1](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.3.0...v1.3.1) (2023-10-27)
+
+
+### Bug Fixes
+
+* add missing css for wrapping overflow ([6a77b1e](https://github.com/BrightGrafana/bright-tree-panel/commit/6a77b1ec822e16d9d1823b1decdf840024703db8))
+
 ## [1.3.0](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.2.7...v1.3.0) (2023-10-24)
 
 
