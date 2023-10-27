@@ -8,6 +8,7 @@ import { buildTree, getPath } from './TreeBuilder';
 import { Utils } from './utils';
 import { Validator } from './validator';
 import { locationService } from '@grafana/runtime';
+import './CSS/classes.css';
 
 export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   // validate options input before anything else
