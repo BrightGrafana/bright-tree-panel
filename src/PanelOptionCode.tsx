@@ -14,11 +14,7 @@ export const PanelOptionCode: React.FC<StandardEditorProps<string, any, any, any
     };
 
     const content =
-      typeof value === 'string'
-        ? value
-        : language === 'javascript'
-          ? value
-          : JSON.stringify(value, null, 2);
+      typeof value === 'string' ? value : language === 'javascript' ? value : JSON.stringify(value, null, 2);
 
     return (
       <ResizableBox

@@ -56,8 +56,7 @@ describe('Validator', () => {
             ];
 
             // act
-            const result = () =>
-                Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [] }]);
+            const result = () => Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [] }]);
 
             // assert
             expect(result).toThrowError('Detached branch detected for id: 2');
@@ -91,7 +90,10 @@ describe('Validator', () => {
         });
 
         it('should throw an error if displayedTreeDepth is undefined', () => {
-            const invalidOptions: PanelOptions = { ...mockPanelOptions, displayedTreeDepth: undefined } as unknown as PanelOptions;
+            const invalidOptions: PanelOptions = {
+                ...mockPanelOptions,
+                displayedTreeDepth: undefined,
+            } as unknown as PanelOptions;
             expect(() => Validator.validateOptionsInput(invalidOptions, mockPanelData)).toThrow(
                 new ReferenceError("'Expanded levels' must be defined and >= 0 in panel options.")
             );
@@ -103,30 +105,26 @@ describe('Validator', () => {
             );
         });
 
-        it('should throw an error if dashboardVariableName is missing',
-            () => {
-                const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
-                invalidOptions['dashboardVariableName'] = undefined;
+        it('should throw an error if dashboardVariableName is missing', () => {
+            const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
+            invalidOptions['dashboardVariableName'] = undefined;
 
-                expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
-                    new ReferenceError(
-                        "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
-                    )
-                );
-            }
-        )
-        it('should throw an error if dashboardVariableName is blank string',
-            () => {
-                const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
-                invalidOptions['dashboardVariableName'] = '  ';
+            expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
+                new ReferenceError(
+                    "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+                )
+            );
+        });
+        it('should throw an error if dashboardVariableName is blank string', () => {
+            const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
+            invalidOptions['dashboardVariableName'] = '  ';
 
-                expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
-                    new ReferenceError(
-                        "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
-                    )
-                );
-            }
-        )
+            expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
+                new ReferenceError(
+                    "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+                )
+            );
+        });
 
         it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
             'should throw an error if %s is missing',
@@ -140,7 +138,7 @@ describe('Validator', () => {
                     )
                 );
             }
-        )
+        );
 
         it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
             'should throw an error if %s is blank string',
@@ -154,14 +152,16 @@ describe('Validator', () => {
                     )
                 );
             }
-        )
-        it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])('should throw an error if %s is not in the data', (column) => {
-
-            const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
-            invalidOptions[column] = 'nonExistentColumn';
-            expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
-                new ReferenceError("'nonExistentColumn' is not a table column.")
-            );
-        });
+        );
+        it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
+            'should throw an error if %s is not in the data',
+            (column) => {
+                const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
+                invalidOptions[column] = 'nonExistentColumn';
+                expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
+                    new ReferenceError("'nonExistentColumn' is not a table column.")
+                );
+            }
+        );
     });
 });

@@ -1,13 +1,10 @@
-import { RawNode, TreeLevelOrderMode, TreeNode } from "models";
-import { Validator } from "validator";
+import { RawNode, TreeLevelOrderMode, TreeNode } from 'models';
+import { Validator } from 'validator';
 
 export class Tree {
     private tree: TreeNode[] = [];
 
-    constructor(
-        private rawNodes: RawNode[],
-        private orderLevels: TreeLevelOrderMode
-    ) {
+    constructor(private rawNodes: RawNode[], private orderLevels: TreeLevelOrderMode) {
         Validator.validateTreeInput(this.rawNodes);
         this.buildTree();
         // TODO: find circulair deps
@@ -58,7 +55,7 @@ export class Tree {
      */
     getNodeIdsForDepth(maxDepth: number): string[] {
         if (!maxDepth || maxDepth < 0) {
-            throw new ReferenceError("maxDepth should be positive number");
+            throw new ReferenceError('maxDepth should be positive number');
         }
 
         const traverse = (nodes: TreeNode[], currentDepth: number): string[] => {
@@ -87,16 +84,18 @@ export class Tree {
     getPath(id: TreeNode['id']): Array<TreeNode['id']> {
         const traverse = (nodes: TreeNode[], search: TreeNode['id']): Array<TreeNode['id']> => {
             for (const node of nodes) {
-                if (node.id === search) { return [node.id]; }
+                if (node.id === search) {
+                    return [node.id];
+                }
 
                 const childResult = traverse(node.children, search);
                 if (childResult.length > 0) {
-                    return [node.id, ...childResult]
+                    return [node.id, ...childResult];
                 }
             }
 
             return [];
-        }
+        };
 
         return traverse(this.tree, id);
     }

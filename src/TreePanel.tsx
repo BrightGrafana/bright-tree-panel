@@ -21,9 +21,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
   );
   Validator.validateTreeInput(queryResult);
 
-  const newTree = React.useMemo(() => new Tree(queryResult, options.orderLevels),
-    [queryResult, options.orderLevels]
-  );
+  const newTree = React.useMemo(() => new Tree(queryResult, options.orderLevels), [queryResult, options.orderLevels]);
 
   // Determine expanded nodes
   const expandedNodeIds: string[] = React.useMemo(
@@ -86,8 +84,9 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
         <TreeItem
           key={node.id}
           nodeId={node.id}
-          label={`${node.name}${(node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
-            }`}
+          label={`${node.name}${
+            (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
+          }`}
         >
           {Array.isArray(node.children) ? renderTree(node.children) : null}
         </TreeItem>
