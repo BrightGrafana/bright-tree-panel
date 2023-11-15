@@ -4,3 +4,7 @@
   height: 100%;
   white-space: nowrap;
 }
+
+.treeView .Mui-selected .MuiTreeItem-label {
+  font-weight: bold;
+}
