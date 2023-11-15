@@ -57,7 +57,7 @@ describe('Validator', () => {
 
             // act
             const result = () =>
-                Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', parent: undefined, children: [] }]);
+                Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [] }]);
 
             // assert
             expect(result).toThrowError('Detached branch detected for id: 2');

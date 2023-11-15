@@ -1,5 +1,5 @@
-import { RawNode } from "./raw-node";
-
-export interface Node extends RawNode {
-    children: Node[];
+export interface TreeNode {
+    id: string;
+    name: string;
+    children: TreeNode[];
 }

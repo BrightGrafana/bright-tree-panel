@@ -1,5 +1,5 @@
 import { DataFrame, DataFrameView, PanelData } from '@grafana/data';
-import { Node, PanelOptions, RawNode } from './models';
+import { PanelOptions, RawNode } from './models';
 
 /**
  * Utility class containing various functions for data manipulation.
@@ -68,7 +68,7 @@ export class Utils {
    * @param {string} idColumn - The name of the column containing node IDs.
    * @param {string} parentColumn - The name of the column containing parent node IDs.
    * @param {string} labelColumn - The name of the column containing node labels.
-   * @returns {Node[]} An array of Node objects.
+   * @returns {TreeNode[]} An array of Node objects.
    */
   static dfToNodeArray(df: DataFrame, idColumn: string, parentColumn: string, labelColumn: string): RawNode[] {
     const data = new DataFrameView(df).toArray();
@@ -78,42 +78,5 @@ export class Utils {
       id: `${dfRow[idColumn]}`,
       parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
     }));
-  }
-
-  /**
-   * Get the IDs of expanded nodes in a tree structure up to a specified depth.
-   *
-   * @param {Node[]} tree - The tree structure represented as an array of Node objects.
-   * @param {number} maxDepth - The maximum depth to consider for expanded nodes.
-   * @returns {string[]} An array of node IDs that are expanded.
-   */
-  static getExpandedNodeIdsForDepth(tree: Node[], maxDepth: number): string[] {
-    if (!maxDepth || maxDepth < 0) {
-      throw new ReferenceError('maxDepth should be positive number');
-    }
-    if (!tree) {
-      return [];
-    }
-
-    const traverse = (nodes: Node[], currentDepth: number): string[] => {
-      const result: string[] = [];
-
-      for (const node of nodes) {
-        if ((node.children || []).length === 0) {
-          continue;
-        }
-
-        if (currentDepth < maxDepth) {
-          result.push(node.id);
-        }
-        if (currentDepth + 1 < maxDepth) {
-          result.push(...traverse((node.children || []), currentDepth + 1));
-        }
-      }
-
-      return result;
-    };
-
-    return traverse(tree, 0);
   }
 }
