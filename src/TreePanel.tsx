@@ -3,12 +3,12 @@ import { TreeItem } from '@mui/x-tree-view/TreeItem';
 import { ExpandMore, ChevronRight } from '@mui/icons-material';
 import React from 'react';
 import { PanelProps } from '@grafana/data';
-import { Node, PanelOptions, RawNode } from './models';
-import { buildTree, getPath } from './TreeBuilder';
+import { TreeNode, PanelOptions, RawNode } from './models';
 import { Utils } from './utils';
 import { Validator } from './validator';
 import { locationService } from '@grafana/runtime';
 import './CSS/classes.css';
+import { Tree } from 'tree';
 
 export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   // validate options input before anything else
@@ -21,16 +21,14 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
   );
   Validator.validateTreeInput(queryResult);
 
-  // buildTree
-  const tree: Node[] = React.useMemo(
-    () => buildTree(queryResult, options.orderLevels),
+  const newTree = React.useMemo(() => new Tree(queryResult, options.orderLevels),
     [queryResult, options.orderLevels]
   );
 
   // Determine expanded nodes
   const expandedNodeIds: string[] = React.useMemo(
-    () => Utils.getExpandedNodeIdsForDepth(tree, options.displayedTreeDepth),
-    [tree, options]
+    () => newTree.getNodeIdsForDepth(options.displayedTreeDepth),
+    [newTree, options]
   );
 
   const [expanded, setExpanded] = React.useState<string[]>(expandedNodeIds);
@@ -69,28 +67,27 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
   // set selected based on url
   const providedNodes = getProvidedNodes(options.dashboardVariableName);
   if (JSON.stringify(providedNodes) !== JSON.stringify(selected)) {
-    const extraExpansions: string[] = [];
+    const expandedBasedOnUrl: string[] = [];
     providedNodes.forEach((selectedNodeId: string) => {
-      getPath(queryResult, queryResult.find((node) => node.id === selectedNodeId) as RawNode).forEach((nodeId) => {
-        if (!expanded.includes(nodeId) && !extraExpansions.includes(nodeId)) {
-          extraExpansions.push(nodeId);
+      newTree.getPath(selectedNodeId).forEach((nodeId) => {
+        if (!expanded.includes(nodeId) && !expandedBasedOnUrl.includes(nodeId)) {
+          expandedBasedOnUrl.push(nodeId);
         }
       });
     });
 
-    setExpanded([...expanded, ...extraExpansions]);
+    setExpanded([...expanded, ...expandedBasedOnUrl]);
     setSelected(providedNodes);
   }
 
-  const renderTree = (nodes: Node[]) => {
-    return nodes.map((node: Node) => {
+  const renderTree = (nodes: TreeNode[]) => {
+    return nodes.map((node: TreeNode) => {
       return (
         <TreeItem
           key={node.id}
           nodeId={node.id}
-          label={`${node.name}${
-            (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
-          }`}
+          label={`${node.name}${(node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
+            }`}
         >
           {Array.isArray(node.children) ? renderTree(node.children) : null}
         </TreeItem>
@@ -110,7 +107,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
         onNodeSelect={handleSelect}
         multiSelect={options.multiSelect ? true : undefined}
       >
-        {renderTree(tree)}
+        {renderTree(newTree.getTree())}
       </TreeView>
     </div>
   );

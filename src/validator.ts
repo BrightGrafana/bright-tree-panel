@@ -1,5 +1,5 @@
 import { PanelData } from '@grafana/data';
-import { RawNode, Node, PanelOptions } from './models';
+import { RawNode, TreeNode, PanelOptions } from './models';
 import { Utils } from './utils';
 
 /**
@@ -38,10 +38,10 @@ export class Validator {
         });
     }
 
-    public static validateTreeBranches(rawNodes: RawNode[], tree: Node[]): void {
+    public static validateTreeBranches(rawNodes: RawNode[], tree: TreeNode[]): void {
         // fetch all nodes in tree.
         const treeNodes: string[] = [];
-        const findNodeIds = (nodes: Node[]) => {
+        const findNodeIds = (nodes: TreeNode[]) => {
             nodes.forEach((node) => {
                 treeNodes.push(node.id);
                 if (node.children) {

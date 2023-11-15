@@ -1,6 +1,5 @@
 import { PanelData, DataFrameDTO, FieldType, MutableDataFrame, DataFrame } from '@grafana/data';
 import { Utils } from './utils';
-import { Node } from './models';
 
 describe('Utils', () => {
     describe('extractSelectedTreeNodes', () => {
@@ -103,57 +102,6 @@ describe('Utils', () => {
                 { name: 'Node 1', id: '1', parent: undefined },
                 { name: 'Node 2', id: '2', parent: '1' },
             ]);
-        });
-    });
-
-    describe('getExpandedNodeIdsForDepth', () => {
-        it('should return an array of expanded node IDs up to a specified depth', () => {
-            const tree: Node[] = [
-                {
-                    id: '1',
-                    children: [
-                        { id: '2', children: [], parent: 'n1', name: 'n2' },
-                        { id: '3', children: [], parent: 'n1', name: 'n3' },
-                    ],
-                    name: 'n1',
-                },
-                {
-                    id: '4',
-                    children: [
-                        {
-                            id: '5',
-                            children: [
-                                { id: '6', children: [{ id: '7', children: [], parent: 'n6', name: 'n7' }], parent: 'n5', name: 'n6' },
-                            ],
-                            parent: 'n4',
-                            name: 'n5',
-                        },
-                    ],
-                    name: 'n4',
-                },
-            ];
-            const result = Utils.getExpandedNodeIdsForDepth(tree, 2);
-            expect(result).toEqual(['1', '4', '5']);
-        });
-
-        it('should handle an empty tree array', () => {
-            const result = Utils.getExpandedNodeIdsForDepth([], 2);
-            expect(result).toEqual([]);
-        });
-
-        it('should handle an undefined tree', () => {
-            const result = Utils.getExpandedNodeIdsForDepth(undefined as any as Node[], 2);
-            expect(result).toEqual([]);
-        });
-
-        it('should throw an error when max depth is negative', () => {
-            expect(() => Utils.getExpandedNodeIdsForDepth([], -1)).toThrowError('maxDepth should be positive number');
-        });
-
-        it('should throw an error when max depth undefined', () => {
-            expect(() => Utils.getExpandedNodeIdsForDepth([], undefined as any as number)).toThrowError(
-                'maxDepth should be positive number'
-            );
         });
     });
 });
