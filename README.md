@@ -29,6 +29,7 @@ When configuring the panel, you have several customization options at your dispo
 - **Show item count**: Toggle to display the count of first-level child nodes for nodes with children.
 - **Order in each level**: Sort nodes by name in ascending, descending, or custom order.
 - **Allow multi select using Ctrl-Click or Shift-Click**: Enable multiple node selection by holding the Ctrl or shift key.
+- **Toggle mode**: customize toggle control allowing for `no toggle`, `toggle only on chevron`, `toggle on label and chevron`, `only expand on label`
 - **Node click dashboard variable**: Define the dashboard variable to set when clicking a node or leaf.
 
 ![Plugin Options Demo](https://equansdatahub.azureedge.net/grafana-tree-panel/equans-grafana-tree-plugin-options-demo.gif)
