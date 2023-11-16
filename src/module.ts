@@ -1,6 +1,6 @@
 import { PanelPlugin } from '@grafana/data';
 import { TreePanel } from './TreePanel';
-import { PanelOptions, TreeLevelOrderMode } from './models';
+import { PanelOptions, ToggleMode, TreeLevelOrderMode } from './models';
 
 export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((builder) => {
   return builder
@@ -49,6 +49,19 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       path: 'multiSelect',
       name: 'Allow multi select using Ctrl-Click or Shift-Click.',
       defaultValue: true,
+    })
+    .addSelect({
+      path: 'toggleSelectMode',
+      name: 'Toggle mode',
+      defaultValue: ToggleMode.SingleClick,
+      settings: {
+        options: [
+          { value: ToggleMode.ExpandOnly, label: 'Label only expand' },
+          { value: ToggleMode.SingleClick, label: 'Label & chevron' },
+          { value: ToggleMode.ChevronOnly, label: 'Chevron only' },
+          { value: ToggleMode.Expanded, label: 'No Toggle' },
+        ],
+      },
     })
     .addTextInput({
       path: 'dashboardVariableName',
