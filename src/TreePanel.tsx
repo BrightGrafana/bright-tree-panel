@@ -32,6 +32,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
         tree={tree}
         options={{
           showItemCount: options.showItemCount,
+          showSearch: options.showSearch,
           toggleMode: options.toggleSelectMode,
           multiSelect: options.multiSelect,
           dashboardVariableName: options.dashboardVariableName,

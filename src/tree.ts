@@ -99,4 +99,20 @@ export class Tree {
 
     return traverse(this.tree, id);
   }
+
+  searchTree(searchTerm: string): TreeNode[] {
+    return this._searchTree(this.tree, searchTerm);
+  }
+
+  private _searchTree(nodes: TreeNode[], searchTerm: string): TreeNode[] {
+    const result: TreeNode[] = [];
+    for (let node of nodes) {
+      const children = this._searchTree(node.children, searchTerm);
+      if (children.length > 0 || node.name.toLowerCase().includes(searchTerm.toLowerCase())) {
+        result.push({ ...node, children });
+      }
+    }
+
+    return result;
+  }
 }

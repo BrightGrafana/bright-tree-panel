@@ -82,6 +82,7 @@ describe('Validator', () => {
     multiSelect: true,
     orderLevels: TreeLevelOrderMode.Asc,
     showItemCount: true,
+    showSearch: true,
     toggleSelectMode: ToggleMode.SingleClick,
   };
 

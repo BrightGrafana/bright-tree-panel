@@ -9,5 +9,6 @@ export type TreeViewOptions = {
   multiSelect: boolean;
   showItemCount: boolean;
   toggleMode: ToggleMode;
+  showSearch: boolean;
   dashboardVariableName: string;
 };

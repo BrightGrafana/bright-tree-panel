@@ -33,6 +33,11 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       name: 'Show item count',
       defaultValue: false,
     })
+    .addBooleanSwitch({
+      path: 'showSearch',
+      name: 'Show Search',
+      defaultValue: false,
+    })
     .addRadio({
       path: 'orderLevels',
       name: 'Order in each level.',
