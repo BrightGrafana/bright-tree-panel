@@ -18,7 +18,6 @@ export const TreeView = ({
   options: TreeViewOptions;
   expanded: string[];
 }) => {
-  // TODO: track locationService updates from within the dashboard (https://github.com/BrightGrafana/bright-tree-panel/issues/16)
   const getProvidedNodes = (dashboardVariableName: string): string[] => {
     const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
     if (!input) {
@@ -30,15 +29,28 @@ export const TreeView = ({
 
     return input as string[];
   };
+  const dashboardVariableName = React.useMemo(() => options.dashboardVariableName, [options.dashboardVariableName]);
 
   // set inital selected based on url
-  const providedNodeIds = getProvidedNodes(options.dashboardVariableName);
+  const providedNodeIds = getProvidedNodes(dashboardVariableName);
 
   const [expandedNodes, setExpanded] = React.useState<string[]>([
     ...baseExpanded,
-    ...getProvidedNodes(options.dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
+    ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
   ]);
   const [selectedNodes, setSelected] = React.useState<string[]>(providedNodeIds);
+
+  React.useEffect(() => {
+    const history = locationService.getHistory();
+    const unlisten = history.listen(() => {
+      setSelected(getProvidedNodes(dashboardVariableName));
+      setExpanded([
+        ...baseExpanded,
+        ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
+      ]);
+    });
+    return unlisten;
+  }, [baseExpanded, dashboardVariableName, tree]);
 
   const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
     const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
