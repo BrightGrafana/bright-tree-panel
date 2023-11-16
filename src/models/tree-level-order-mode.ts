@@ -1,5 +1,5 @@
 export enum TreeLevelOrderMode {
-    Asc = 'asc',
-    Desc = 'desc',
-    Source = 'source',
+  Asc = 'asc',
+  Desc = 'desc',
+  Source = 'source',
 }

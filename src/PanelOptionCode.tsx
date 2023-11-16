@@ -4,6 +4,7 @@ import { CodeEditor } from '@grafana/ui';
 const { ResizableBox } = require('react-resizable');
 import './CSS/panel.css';
 
+// TODO: remove PanelOptionCode and try to remove react-resizable 
 export const PanelOptionCode: React.FC<StandardEditorProps<string, any, any, any>> = React.memo(
   ({ value, onChange }) => {
     const language = 'javascript';
