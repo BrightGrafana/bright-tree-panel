@@ -8,6 +8,7 @@ export interface PanelOptions {
   parentIdColumn: string;
   displayedTreeDepth: number;
   showItemCount: boolean;
+  showSearch: boolean;
   dashboardVariableName: string;
   toggleSelectMode: ToggleMode;
 }

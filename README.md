@@ -27,6 +27,7 @@ When configuring the panel, you have several customization options at your dispo
 - **Node parent ID field name**: Set the field containing the parent node IDs.
 - **Expanded levels**: Control the number of expanded tree layers initially displayed.
 - **Show item count**: Toggle to display the count of first-level child nodes for nodes with children.
+- **Show Search**: toogle to display search bar
 - **Order in each level**: Sort nodes by name in ascending, descending, or custom order.
 - **Allow multi select using Ctrl-Click or Shift-Click**: Enable multiple node selection by holding the Ctrl or shift key.
 - **Toggle mode**: customize toggle control allowing for `no toggle`, `toggle only on chevron`, `toggle on label and chevron`, `only expand on label`

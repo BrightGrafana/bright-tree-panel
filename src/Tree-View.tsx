@@ -7,6 +7,7 @@ import { TreeView as XTreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem, TreeItemProps, useTreeItem, TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
 import { ToggleMode, TreeNode, TreeViewOptions } from './models';
 import { locationService } from '@grafana/runtime';
+import { Input } from '@grafana/ui';
 import { Tree } from 'tree';
 
 export const TreeView = ({
@@ -18,6 +19,9 @@ export const TreeView = ({
   options: TreeViewOptions;
   expanded: string[];
 }) => {
+  const [filter, setFilter] = React.useState<string>('');
+  const [treeData, setTreeData] = React.useState<TreeNode[]>(tree.getTree());
+
   const getProvidedNodes = (dashboardVariableName: string): string[] => {
     const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
     if (!input) {
@@ -80,6 +84,8 @@ export const TreeView = ({
       handleSelection(event);
     };
 
+    const startIndex = `${filter}`.length > 0 ? `${label}`.toLowerCase().indexOf(filter.toLowerCase()) : -1;
+
     return (
       <div
         className={clsx(className, classes.root, {
@@ -95,7 +101,17 @@ export const TreeView = ({
           {icon}
         </div>
         <Typography onClick={handleSelectionClick} component="div" className={classes.label}>
-          {label}
+          {startIndex > -1 ? (
+            <>
+              <span>{`${label}`.slice(0, startIndex)}</span>
+              <span style={{ textDecoration: 'underline' }}>
+                {`${label}`.slice(startIndex, startIndex + `${filter}`.length)}
+              </span>
+              <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
+            </>
+          ) : (
+            label
+          )}
         </Typography>
       </div>
     );
@@ -133,8 +149,46 @@ export const TreeView = ({
     setExpanded(nodeIds);
   };
 
+  const getAllIds = (inputTree: TreeNode[]): string[] => {
+    const traverse = (nodes: TreeNode[], currentDepth: number): string[] => {
+      const result: string[] = [];
+
+      for (const node of nodes) {
+        result.push(node.id);
+        result.push(...traverse(node.children || [], currentDepth + 1));
+      }
+
+      return result;
+    };
+
+    return traverse(inputTree, 0);
+  };
+
+  const onSearchInput = (e: any) => {
+    const value = e.target.value;
+    const newFilter = value.trim();
+    setFilter(newFilter);
+
+    if (!newFilter) {
+      setTreeData(tree.getTree());
+      setExpanded([
+        ...baseExpanded,
+        ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
+      ]);
+
+      return;
+    }
+
+    const tempTree = tree.searchTree(newFilter);
+
+    setTreeData(() => tempTree);
+    // show search results fully expanded
+    setExpanded(() => getAllIds(tempTree));
+  };
+
   return (
     <>
+      {options.showSearch ? <Input placeholder="Search values" onChange={onSearchInput} /> : null}
       <XTreeView
         aria-label="controlled"
         defaultCollapseIcon={<ExpandMoreIcon />}
@@ -145,7 +199,7 @@ export const TreeView = ({
         onNodeSelect={handleSelect}
         multiSelect={options.multiSelect ? true : undefined}
       >
-        {renderTree(tree.getTree())}
+        {renderTree(treeData)}
       </XTreeView>
     </>
   );
