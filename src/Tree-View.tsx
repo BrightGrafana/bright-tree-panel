@@ -42,6 +42,7 @@ export const TreeView = ({
     ...baseExpanded,
     ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
   ]);
+
   const [selectedNodes, setSelected] = React.useState<string[]>(providedNodeIds);
 
   React.useEffect(() => {
@@ -50,11 +51,12 @@ export const TreeView = ({
       setSelected(getProvidedNodes(dashboardVariableName));
       setExpanded([
         ...baseExpanded,
+        ...expandedNodes,
         ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
       ]);
     });
     return unlisten;
-  }, [baseExpanded, dashboardVariableName, tree]);
+  }, [baseExpanded, expandedNodes, dashboardVariableName, tree]);
 
   const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
     const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
