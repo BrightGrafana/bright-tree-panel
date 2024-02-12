@@ -64,7 +64,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
           { value: ToggleMode.ExpandOnly, label: 'Label only expand' },
           { value: ToggleMode.SingleClick, label: 'Label & chevron' },
           { value: ToggleMode.ChevronOnly, label: 'Chevron only' },
-          { value: ToggleMode.Expanded, label: 'No Toggle' },
+          { value: ToggleMode.NoTogle, label: 'No Toggle' },
         ],
       },
     })

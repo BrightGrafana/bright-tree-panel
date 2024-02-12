@@ -48,7 +48,10 @@ export const TreeView = ({
   React.useEffect(() => {
     const history = locationService.getHistory();
     const unlisten = history.listen(() => {
-      setSelected(getProvidedNodes(dashboardVariableName));
+      setSelected(() => {
+        console.log('[history.listen] ->setSelected()');
+        return getProvidedNodes(dashboardVariableName);
+      });
       setExpanded([
         ...baseExpanded,
         ...expandedNodes,
@@ -69,20 +72,28 @@ export const TreeView = ({
       preventSelection(event);
     };
 
-    const handleExpansionClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (options.toggleMode === ToggleMode.Expanded) {
+    const handleChevronClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      // Do nothing if ToggleMode.NoTogle
+      if (options.toggleMode === ToggleMode.NoTogle) {
+        console.log(`[handleChevronClick] if ${ToggleMode.NoTogle}`);
         return;
       }
+
+      console.log(`[handleChevronClick] normal behavior`);
       handleExpansion(event);
     };
 
-    const handleSelectionClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleNodeSelection = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+      console.log(`[handleNodeSelection] ${expanded}, ${options.toggleMode}`);
       if (
         (!expanded && options.toggleMode !== ToggleMode.ChevronOnly) ||
         options.toggleMode === ToggleMode.SingleClick
       ) {
         handleExpansion(event);
       }
+
+      console.log(`[handleNodeSelection] -> handleSelection()`);
+      console.log(disabled, expanded, selected, focused, handleExpansion, handleSelection, preventSelection);
       handleSelection(event);
     };
 
@@ -99,10 +110,10 @@ export const TreeView = ({
         onMouseDown={handleMouseDown}
         ref={ref as React.Ref<HTMLDivElement>}
       >
-        <div onClick={handleExpansionClick} className={classes.iconContainer}>
+        <div onClick={handleChevronClick} className={classes.iconContainer}>
           {icon}
         </div>
-        <Typography onClick={handleSelectionClick} component="div" className={classes.label}>
+        <Typography onClick={handleNodeSelection} component="div" className={classes.label}>
           {startIndex > -1 ? (
             <>
               <span>{`${label}`.slice(0, startIndex)}</span>
