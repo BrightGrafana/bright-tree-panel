@@ -43,11 +43,8 @@ export const TreeView = ({
       ...baseExpanded,
       ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
         const nodes = tree.getPath(providedNodeId);
-        // if (options.toggleMode === ToggleMode.NoTogle || options.toggleMode === ToggleMode.ChevronOnly) {
-        return nodes.filter((nodeId) => nodeId !== providedNodeId);
-        // }
 
-        // return nodes;
+        return nodes.filter((nodeId) => nodeId !== providedNodeId);
       }),
     ]),
   ]);
@@ -66,14 +63,8 @@ export const TreeView = ({
           ...expandedNodes,
           ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
             const nodes = tree.getPath(providedNodeId);
-            // if (
-            //   options.toggleMode === ToggleMode.NoTogle ||
-            //   options.toggleMode === ToggleMode.ChevronOnly ||
-            //   options.toggleMode === ToggleMode.SingleClick
-            // ) {
+
             return nodes.filter((nodeId) => nodeId !== providedNodeId);
-            // }
-            // return nodes;
           }),
         ]),
       ];
@@ -194,6 +185,7 @@ export const TreeView = ({
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setSelected(nodeIds);
   };
+
   // still needed for keyboard toggle
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
     if (options.toggleMode === ToggleMode.NoTogle) {
