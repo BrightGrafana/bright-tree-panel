@@ -39,8 +39,17 @@ export const TreeView = ({
   const providedNodeIds = getProvidedNodes(dashboardVariableName);
 
   const [expandedNodes, setExpanded] = React.useState<string[]>([
-    ...baseExpanded,
-    ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
+    ...new Set([
+      ...baseExpanded,
+      ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
+        const nodes = tree.getPath(providedNodeId);
+        // if (options.toggleMode === ToggleMode.NoTogle || options.toggleMode === ToggleMode.ChevronOnly) {
+        return nodes.filter((nodeId) => nodeId !== providedNodeId);
+        // }
+
+        // return nodes;
+      }),
+    ]),
   ]);
 
   const [selectedNodes, setSelected] = React.useState<string[]>(providedNodeIds);
@@ -49,22 +58,35 @@ export const TreeView = ({
     const history = locationService.getHistory();
     const unlisten = history.listen(() => {
       setSelected(() => {
-        console.log('[history.listen] ->setSelected()');
+        console.log('[history.listen] -> setSelected()');
         return getProvidedNodes(dashboardVariableName);
       });
-      setExpanded([
-        ...baseExpanded,
-        ...expandedNodes,
-        ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
-      ]);
+      const tempExpandedNodes = [
+        ...new Set([
+          ...expandedNodes,
+          ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
+            const nodes = tree.getPath(providedNodeId);
+            // if (
+            //   options.toggleMode === ToggleMode.NoTogle ||
+            //   options.toggleMode === ToggleMode.ChevronOnly ||
+            //   options.toggleMode === ToggleMode.SingleClick
+            // ) {
+            return nodes.filter((nodeId) => nodeId !== providedNodeId);
+            // }
+            // return nodes;
+          }),
+        ]),
+      ];
+      console.log(`[history.listen] ${expandedNodes.join(', ')}`);
+      setExpanded(tempExpandedNodes);
     });
+
     return unlisten;
-  }, [baseExpanded, expandedNodes, dashboardVariableName, tree]);
+  }, [expandedNodes, dashboardVariableName, tree, options.toggleMode]);
 
   const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
     const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
-    const { disabled, expanded, selected, focused, handleExpansion, handleSelection, preventSelection } =
-      useTreeItem(nodeId);
+    const { disabled, expanded, selected, focused, handleSelection, preventSelection } = useTreeItem(nodeId);
     const icon = iconProp || expansionIcon || displayIcon;
 
     // prevent normale mouse handler
@@ -73,27 +95,39 @@ export const TreeView = ({
     };
 
     const handleChevronClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      // Do nothing if ToggleMode.NoTogle
+      console.log(options.toggleMode, ToggleMode.NoTogle);
       if (options.toggleMode === ToggleMode.NoTogle) {
-        console.log(`[handleChevronClick] if ${ToggleMode.NoTogle}`);
+        console.log(`[handleChevronClick] node ${nodeId} (no toggle)`);
+
         return;
       }
 
-      console.log(`[handleChevronClick] normal behavior`);
-      handleExpansion(event);
+      if (!expanded) {
+        console.log(`[handleChevronClick] expand node ${nodeId}`);
+        setExpanded([...expandedNodes, nodeId]);
+      } else {
+        console.log(`[handleChevronClick] contract node ${nodeId}`);
+        setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== nodeId));
+      }
     };
 
     const handleNodeSelection = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      console.log(`[handleNodeSelection] ${expanded}, ${options.toggleMode}`);
-      if (
-        (!expanded && options.toggleMode !== ToggleMode.ChevronOnly) ||
-        options.toggleMode === ToggleMode.SingleClick
-      ) {
-        handleExpansion(event);
+      if (options.toggleMode === ToggleMode.NoTogle || options.toggleMode === ToggleMode.ChevronOnly) {
+        console.log(`[handleLabelClick] node ${nodeId} (no label toggle)`);
+      } else {
+        if (!expanded) {
+          console.log(`[handleLabelClick] expand node ${nodeId}`);
+          setExpanded([...expandedNodes, nodeId]);
+          console.log(`[handleLabelClick] expanded nodes ${expandedNodes.join(', ')}`);
+        } else if (expanded && options.toggleMode === ToggleMode.SingleClick) {
+          console.log(`[handleLabelClick] contract node ${nodeId}`);
+          setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== nodeId));
+        } else if (expanded && options.toggleMode === ToggleMode.ExpandOnly) {
+          console.log(`[handleLabelClick] node ${nodeId} (no label toggle - expand only)`);
+        }
       }
 
       console.log(`[handleNodeSelection] -> handleSelection()`);
-      console.log(disabled, expanded, selected, focused, handleExpansion, handleSelection, preventSelection);
       handleSelection(event);
     };
 
@@ -150,15 +184,23 @@ export const TreeView = ({
     });
   };
 
+  React.useEffect(() => {
+    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedNodes)) return;
+
+    locationService.partial({ [`var-${dashboardVariableName}`]: selectedNodes }, true);
+  }, [selectedNodes, dashboardVariableName]);
+
   // still needed for keyboard toggle
   const handleSelect = (event: React.SyntheticEvent, nodeIds: string[]) => {
     setSelected(nodeIds);
-
-    const urlNodeIds = typeof nodeIds === 'number' ? [nodeIds] : nodeIds;
-    locationService.partial({ [`var-${options.dashboardVariableName}`]: urlNodeIds }, true);
   };
   // still needed for keyboard toggle
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
+    if (options.toggleMode === ToggleMode.NoTogle) {
+      console.log(`[handleToggle] (no toggle)`);
+
+      return;
+    }
     setExpanded(nodeIds);
   };
 
