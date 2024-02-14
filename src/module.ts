@@ -59,9 +59,11 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       path: 'toggleSelectMode',
       name: 'Toggle mode',
       defaultValue: ToggleMode.SingleClick,
+      description:
+        'How Chevron and Label clicking is handled. with `no togle` make sure `Expanded levels` is high enough.',
       settings: {
         options: [
-          { value: ToggleMode.ExpandOnly, label: 'Label only expand' },
+          { value: ToggleMode.ExpandOnly, label: 'Label only expands' },
           { value: ToggleMode.SingleClick, label: 'Label & chevron' },
           { value: ToggleMode.ChevronOnly, label: 'Chevron only' },
           { value: ToggleMode.NoTogle, label: 'No Toggle' },
