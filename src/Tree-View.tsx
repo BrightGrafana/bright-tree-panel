@@ -176,7 +176,9 @@ export const TreeView = ({
   };
 
   React.useEffect(() => {
-    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedNodes)) return;
+    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedNodes)) {
+      return;
+    }
 
     locationService.partial({ [`var-${dashboardVariableName}`]: selectedNodes }, true);
   }, [selectedNodes, dashboardVariableName]);
