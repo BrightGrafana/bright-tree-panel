@@ -161,8 +161,17 @@ describe('Validator', () => {
         const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
         invalidOptions[column] = 'nonExistentColumn';
         expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
-          new ReferenceError("'nonExistentColumn' is not a table column.")
+          new ReferenceError("'nonexistentcolumn' is not a table column.")
         );
+      }
+    );
+    it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
+      'should support cases insensative %s column',
+      (column: string) => {
+        const validOptions = { ...mockPanelOptions } as Record<string, any>;
+        validOptions[column] = validOptions[column].toUpperCase();
+
+        expect(() => Validator.validateOptionsInput(validOptions as PanelOptions, mockPanelData)).not.toThrow();
       }
     );
   });
