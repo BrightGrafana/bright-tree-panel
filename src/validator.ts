@@ -85,8 +85,12 @@ export class Validator {
     }
 
     // Validate column names
-    const colNames = Utils.getDataFrameColumnNames(data);
-    const requiredColumns = [options.idColumn, options.labelColumn, options.parentIdColumn];
+    const colNames = Utils.getDataFrameColumnNames(data).map((colName) => colName.toLowerCase().trim());
+    const requiredColumns = [
+      options.idColumn.toLowerCase().trim(),
+      options.labelColumn.toLowerCase().trim(),
+      options.parentIdColumn.toLowerCase().trim(),
+    ];
 
     for (const colName of requiredColumns) {
       if (!colNames.includes(colName)) {

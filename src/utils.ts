@@ -71,9 +71,12 @@ export class Utils {
    * @returns {TreeNode[]} An array of Node objects.
    */
   static dfToNodeArray(df: DataFrame, idColumn: string, parentColumn: string, labelColumn: string): RawNode[] {
-    const data = new DataFrameView(df).toArray();
+    const dfv = new DataFrameView(df);
 
-    return data.map((dfRow) => ({
+    idColumn =
+      Object.keys(dfv.fields).find((key) => key.toLowerCase().trim() === idColumn.toLowerCase().trim()) || idColumn;
+
+    return dfv.toArray().map((dfRow) => ({
       name: `${dfRow[labelColumn]}`,
       id: `${dfRow[idColumn]}`,
       parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
