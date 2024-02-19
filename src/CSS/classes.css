@@ -8,3 +8,11 @@
 .treeView .Mui-selected .MuiTreeItem-label {
   font-weight: bold;
 }
+
+.bright-tree-panel-table {
+  width: calc(100vw - (100vw - 100%));
+}
+
+.bright-tree-panel-table input[type='search'] {
+  -webkit-appearance: none;
+}

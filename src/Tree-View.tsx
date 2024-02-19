@@ -213,23 +213,41 @@ export const TreeView = ({
     return traverse(inputTree, 0);
   };
 
-  const onSearchInput = (e: any) => {
-    const value = e.target.value;
-    const newFilter = value.trim();
-    setFilter(newFilter);
+  const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
+  const [inSearch, setInSearch] = React.useState<boolean>(false);
 
-    if (!newFilter) {
+  const onSearchInput = (e: any) => {
+    console.log(`[onSearchInput] ${inSearch}`, expandedNodesBeforeSearch);
+    const value = e.target.value;
+    const query = value.trim();
+    setFilter(query);
+
+    if (!query) {
+      // deactivete serach mode: restore tree & restore expanded + posible new selection
+      setInSearch(false);
       setTreeData(tree.getTree());
       setExpanded([
-        ...baseExpanded,
-        ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => tree.getPath(providedNodeId)),
+        ...new Set([
+          ...expandedNodesBeforeSearch,
+          ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
+            const nodes = tree.getPath(providedNodeId);
+
+            return nodes.filter((nodeId) => nodeId !== providedNodeId);
+          }),
+        ]),
       ]);
 
       return;
     }
 
-    const tempTree = tree.searchTree(newFilter);
+    if (!inSearch) {
+      // new search query
+      // store expanded nodes before search
+      setExpandedBeforeSearch([...expandedNodes]);
+      setInSearch(true);
+    }
 
+    const tempTree = tree.searchTree(query);
     setTreeData(() => tempTree);
     // show search results fully expanded
     setExpanded(() => getAllIds(tempTree));
@@ -237,19 +255,37 @@ export const TreeView = ({
 
   return (
     <>
-      {options.showSearch ? <Input placeholder="Search values" onChange={onSearchInput} /> : null}
-      <XTreeView
-        aria-label="controlled"
-        defaultCollapseIcon={<ExpandMoreIcon />}
-        defaultExpandIcon={<ChevronRightIcon />}
-        expanded={expandedNodes}
-        selected={selectedNodes}
-        onNodeToggle={handleToggle}
-        onNodeSelect={handleSelect}
-        multiSelect={options.multiSelect ? true : undefined}
-      >
-        {renderTree(treeData)}
-      </XTreeView>
+      <table className="bright-tree-panel-table">
+        {options.showSearch ? (
+          <thead>
+            <tr>
+              <td>
+                <div style={{ marginBottom: '16px' }}>
+                  <Input placeholder="Search values" onChange={onSearchInput} type="search" />
+                </div>
+              </td>
+            </tr>
+          </thead>
+        ) : null}
+        <tbody>
+          <tr>
+            <td>
+              <XTreeView
+                aria-label="controlled"
+                defaultCollapseIcon={<ExpandMoreIcon />}
+                defaultExpandIcon={<ChevronRightIcon />}
+                expanded={expandedNodes}
+                selected={selectedNodes}
+                onNodeToggle={handleToggle}
+                onNodeSelect={handleSelect}
+                multiSelect={options.multiSelect ? true : undefined}
+              >
+                {renderTree(treeData)}
+              </XTreeView>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </>
   );
 };
