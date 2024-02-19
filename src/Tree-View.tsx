@@ -216,6 +216,15 @@ export const TreeView = ({
   const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
   const [inSearch, setInSearch] = React.useState<boolean>(false);
 
+  const escape = (event: any) => {
+    if (event.key === 'Escape') {
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
+      nativeInputValueSetter.call(event.target, '');
+      const onChangeEvent = new Event('input', { bubbles: true });
+      event.target.dispatchEvent(onChangeEvent);
+    }
+  };
+
   const onSearchInput = (e: any) => {
     console.log(`[onSearchInput] ${inSearch}`, expandedNodesBeforeSearch);
     const value = e.target.value;
@@ -261,7 +270,7 @@ export const TreeView = ({
             <tr>
               <td>
                 <div style={{ marginBottom: '16px' }}>
-                  <Input placeholder="Search values" onChange={onSearchInput} type="search" />
+                  <Input placeholder="Search values" onChange={onSearchInput} type="search" onKeyDown={escape} />
                 </div>
               </td>
             </tr>
