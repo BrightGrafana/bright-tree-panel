@@ -26,6 +26,7 @@ export class Tree {
         name: rawNode.name,
         children: [],
         disabled: rawNode.disabled,
+        link: rawNode.link,
       };
     }
 

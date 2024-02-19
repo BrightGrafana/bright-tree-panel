@@ -19,9 +19,18 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
         options.idColumn,
         options.parentIdColumn,
         options.labelColumn,
-        options.disabledColumn
+        options.disabledColumn,
+        options.hasDataLink ? options.dataLinkUrl : undefined
       ),
-    [data, options.idColumn, options.parentIdColumn, options.labelColumn, options.disabledColumn]
+    [
+      data,
+      options.idColumn,
+      options.parentIdColumn,
+      options.labelColumn,
+      options.disabledColumn,
+      options.hasDataLink,
+      options.dataLinkUrl,
+    ]
   );
   Validator.validateTreeInput(queryResult);
 
@@ -44,6 +53,9 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
           multiSelect: options.multiSelect,
           supportsDisabled: options.supportsDisabled,
           dashboardVariableName: options.dashboardVariableName,
+          hasDataLink: options.hasDataLink,
+          dataLinkUrl: options.dataLinkUrl,
+          dataLinkNewTab: options.dataLinkNewTab,
         }}
         expanded={expandedNodeIds}
       />

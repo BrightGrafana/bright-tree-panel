@@ -1,5 +1,6 @@
-import { DataFrame, DataFrameView, PanelData } from '@grafana/data';
+import { DataFrame, DataFrameView, PanelData, ScopedVars } from '@grafana/data';
 import { PanelOptions, RawNode } from './models';
+import { getTemplateSrv } from '@grafana/runtime';
 
 /**
  * Utility class containing various functions for data manipulation.
@@ -75,18 +76,34 @@ export class Utils {
     idColumn: string,
     parentColumn: string,
     labelColumn: string,
-    disabledColumn: string
+    disabledColumn: string,
+    dataLinkUrl?: string
   ): RawNode[] {
     const dfv = new DataFrameView(df);
 
     idColumn =
       Object.keys(dfv.fields).find((key) => key.toLowerCase().trim() === idColumn.toLowerCase().trim()) || idColumn;
 
-    return dfv.toArray().map((dfRow) => ({
-      name: `${dfRow[labelColumn]}`,
-      id: `${dfRow[idColumn]}`,
-      parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
-      disabled: dfRow[disabledColumn] === true || dfRow[disabledColumn] === 'true' || dfRow[disabledColumn] === '1',
-    }));
+    return dfv.toArray().map((dfRow) => {
+      const fields: Record<string, any> = {};
+      Object.keys(dfRow).forEach((key: string) => {
+        fields[key] = dfRow[key];
+      });
+
+      const tempScopedVars: ScopedVars = {
+        __data: {
+          value: { name: 'A', fields },
+          text: 'Data',
+        },
+      };
+
+      return {
+        name: `${dfRow[labelColumn]}`,
+        id: `${dfRow[idColumn]}`,
+        parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
+        disabled: dfRow[disabledColumn] === true || dfRow[disabledColumn] === 'true' || dfRow[disabledColumn] === '1',
+        link: dataLinkUrl ? getTemplateSrv()?.replace(dataLinkUrl, tempScopedVars) : undefined,
+      };
+    });
   }
 }

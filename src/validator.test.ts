@@ -87,6 +87,9 @@ describe('Validator', () => {
     showItemCount: true,
     showSearch: true,
     toggleSelectMode: ToggleMode.SingleClick,
+    hasDataLink: false,
+    dataLinkUrl: 'http://www.google.com',
+    dataLinkNewTab: false,
   };
 
   describe('validateOptionsInput', () => {

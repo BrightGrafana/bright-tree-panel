@@ -13,4 +13,7 @@ export interface PanelOptions {
   showSearch: boolean;
   dashboardVariableName: string;
   toggleSelectMode: ToggleMode;
+  hasDataLink: boolean;
+  dataLinkUrl: string;
+  dataLinkNewTab: boolean;
 }

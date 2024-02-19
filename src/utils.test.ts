@@ -91,13 +91,20 @@ describe('Utils', () => {
       const data: DataFrameDTO = {
         fields: [
           { name: 'id', values: ['1', '2'], type: FieldType.string },
-          { name: 'parentId', values: [null, '1'], type: FieldType.string },
+          { name: 'parentId', values: [undefined, '1'], type: FieldType.string },
           { name: 'label', values: ['Node 1', 'Node 2'], type: FieldType.string },
           { name: 'disabled', values: [true, false], type: FieldType.boolean },
         ],
       };
 
-      const result = Utils.dfToNodeArray(new MutableDataFrame(data), 'id', 'parentId', 'label', 'disabled');
+      const result = Utils.dfToNodeArray(
+        new MutableDataFrame(data),
+        'id',
+        'parentId',
+        'label',
+        'disabled',
+        'http://test.dev'
+      );
 
       expect(result).toEqual([
         { name: 'Node 1', id: '1', parent: undefined, disabled: true },

@@ -32,7 +32,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       name: 'Node disabled field name',
       description: 'Name of the field that indicates if nodes are disabled.',
       defaultValue: 'disabled',
-      showIf(currentOptions, data) {
+      showIf(currentOptions) {
         return currentOptions.supportsDisabled;
       },
     })
@@ -89,5 +89,30 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       name: 'Dashboard variable name',
       description: 'Name of the dashboard variable in which the id of the clicked node(s) is/are stored.',
       defaultValue: 'Placeholder',
+    })
+    .addBooleanSwitch({
+      path: 'hasDataLink',
+      name: 'Enable Data Link',
+      defaultValue: false,
+      category: ['Data Link'],
+    })
+    .addTextInput({
+      path: 'dataLinkUrl',
+      name: 'Data link URL',
+      description:
+        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for exaple: `${__data.fields.link:raw}${__data.fields.name:percentencode}`',
+      category: ['Data Link'],
+      showIf(currentOptions) {
+        return currentOptions.hasDataLink;
+      },
+    })
+    .addBooleanSwitch({
+      path: 'dataLinkNewTab',
+      name: 'Open in new tab',
+      defaultValue: false,
+      category: ['Data Link'],
+      showIf(currentOptions) {
+        return currentOptions.hasDataLink;
+      },
     });
 });

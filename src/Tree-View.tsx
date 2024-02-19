@@ -75,8 +75,8 @@ export const TreeView = ({
     return unlisten;
   }, [expandedNodes, dashboardVariableName, tree, options.toggleMode]);
 
-  const CustomContent = React.forwardRef(function CustomContent(props: TreeItemContentProps, ref) {
-    const { classes, className, label, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
+  const CustomContent = React.forwardRef(function CustomContent(props: { link?: string } & TreeItemContentProps, ref) {
+    const { classes, className, label, link, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
     const { disabled, expanded, selected, focused, handleSelection, preventSelection } = useTreeItem(nodeId);
     const icon = iconProp || expansionIcon || displayIcon;
 
@@ -147,6 +147,10 @@ export const TreeView = ({
               </span>
               <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
             </>
+          ) : options.hasDataLink ? (
+            <a href={link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
+              {label}
+            </a>
           ) : (
             label
           )}
@@ -169,6 +173,7 @@ export const TreeView = ({
             (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
           }`}
           disabled={options.supportsDisabled && node.disabled}
+          ContentProps={{ link: node.link } as any}
         >
           {Array.isArray(node.children) ? renderTree(node.children) : null}
         </CustomTreeItem>
