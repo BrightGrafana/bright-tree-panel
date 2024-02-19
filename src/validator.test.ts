@@ -79,6 +79,7 @@ describe('Validator', () => {
     idColumn: 'id',
     labelColumn: 'label',
     parentIdColumn: 'parentId',
+    supportsDisabled: false,
     disabledColumn: 'disabled',
     dashboardVariableName: 'myVar',
     multiSelect: true,
