@@ -87,7 +87,7 @@ export class Utils {
     return dfv.toArray().map((dfRow) => {
       const fields: Record<string, any> = {};
       Object.keys(dfRow).forEach((key: string) => {
-        fields[key] = dfRow[key];
+        fields[key] = dfRow[key] ? dfRow[key] : '';
       });
 
       const tempScopedVars: ScopedVars = {
