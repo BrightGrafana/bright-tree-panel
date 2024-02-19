@@ -25,6 +25,7 @@ export class Tree {
         id: rawNode.id,
         name: rawNode.name,
         children: [],
+        disabled: rawNode.disabled,
       };
     }
 

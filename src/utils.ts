@@ -70,7 +70,13 @@ export class Utils {
    * @param {string} labelColumn - The name of the column containing node labels.
    * @returns {TreeNode[]} An array of Node objects.
    */
-  static dfToNodeArray(df: DataFrame, idColumn: string, parentColumn: string, labelColumn: string): RawNode[] {
+  static dfToNodeArray(
+    df: DataFrame,
+    idColumn: string,
+    parentColumn: string,
+    labelColumn: string,
+    disabledColumn: string
+  ): RawNode[] {
     const dfv = new DataFrameView(df);
 
     idColumn =
@@ -80,6 +86,7 @@ export class Utils {
       name: `${dfRow[labelColumn]}`,
       id: `${dfRow[idColumn]}`,
       parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
+      disabled: dfRow[disabledColumn] === true || dfRow[disabledColumn] === 'true' || dfRow[disabledColumn] === '1',
     }));
   }
 }

@@ -6,6 +6,8 @@ export interface PanelOptions {
   idColumn: string;
   labelColumn: string;
   parentIdColumn: string;
+  supportsDisabled: boolean;
+  disabledColumn: string;
   displayedTreeDepth: number;
   showItemCount: boolean;
   showSearch: boolean;

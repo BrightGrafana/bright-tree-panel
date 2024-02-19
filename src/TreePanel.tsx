@@ -13,8 +13,15 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
 
   // Convert data to a Node array
   const queryResult: RawNode[] = React.useMemo(
-    () => Utils.dfToNodeArray(data.series[0], options.idColumn, options.parentIdColumn, options.labelColumn),
-    [data, options.idColumn, options.parentIdColumn, options.labelColumn]
+    () =>
+      Utils.dfToNodeArray(
+        data.series[0],
+        options.idColumn,
+        options.parentIdColumn,
+        options.labelColumn,
+        options.disabledColumn
+      ),
+    [data, options.idColumn, options.parentIdColumn, options.labelColumn, options.disabledColumn]
   );
   Validator.validateTreeInput(queryResult);
 
@@ -35,6 +42,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
           showSearch: options.showSearch,
           toggleMode: options.toggleSelectMode,
           multiSelect: options.multiSelect,
+          supportsDisabled: options.supportsDisabled,
           dashboardVariableName: options.dashboardVariableName,
         }}
         expanded={expandedNodeIds}
