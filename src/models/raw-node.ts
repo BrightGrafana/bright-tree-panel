@@ -3,4 +3,5 @@ export interface RawNode {
   parent?: string;
   name: string;
   disabled: boolean;
+  link?: string;
 }

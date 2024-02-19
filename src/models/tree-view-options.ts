@@ -12,4 +12,7 @@ export type TreeViewOptions = {
   supportsDisabled: boolean;
   showSearch: boolean;
   dashboardVariableName: string;
+  hasDataLink: boolean;
+  dataLinkUrl: string;
+  dataLinkNewTab: boolean;
 };
