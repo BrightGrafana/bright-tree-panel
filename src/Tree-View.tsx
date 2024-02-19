@@ -168,6 +168,7 @@ export const TreeView = ({
           label={`${node.name}${
             (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
           }`}
+          disabled={options.supportsDisabled && node.disabled}
         >
           {Array.isArray(node.children) ? renderTree(node.children) : null}
         </CustomTreeItem>
@@ -288,6 +289,7 @@ export const TreeView = ({
                 onNodeToggle={handleToggle}
                 onNodeSelect={handleSelect}
                 multiSelect={options.multiSelect ? true : undefined}
+                disabledItemsFocusable={false}
               >
                 {renderTree(treeData)}
               </XTreeView>

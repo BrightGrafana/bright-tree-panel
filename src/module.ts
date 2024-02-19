@@ -22,6 +22,20 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       description: 'Name of the field that contains the parent ids of the nodes.',
       defaultValue: 'parent',
     })
+    .addBooleanSwitch({
+      path: 'supportsDisabled',
+      name: 'Support disabled nodes',
+      defaultValue: false,
+    })
+    .addFieldNamePicker({
+      path: 'disabledColumn',
+      name: 'Node disabled field name',
+      description: 'Name of the field that indicates if nodes are disabled.',
+      defaultValue: 'disabled',
+      showIf(currentOptions, data) {
+        return currentOptions.supportsDisabled;
+      },
+    })
     .addNumberInput({
       path: 'displayedTreeDepth',
       name: 'Expanded levels',

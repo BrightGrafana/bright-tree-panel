@@ -4,11 +4,11 @@ import { Tree } from 'tree';
 describe('Tree', () => {
   describe('Constructor', () => {
     const rawNodes: RawNode[] = [
-      { id: '1', name: 'Node 1', parent: undefined },
-      { id: '2', name: 'Node 2', parent: '1' },
-      { id: '3', name: 'Node 3', parent: '1' },
-      { id: '4', name: 'Node 4', parent: '2' },
-      { id: '5', name: 'Node 5', parent: undefined },
+      { id: '1', name: 'Node 1', parent: undefined, disabled: false },
+      { id: '2', name: 'Node 2', parent: '1', disabled: false },
+      { id: '3', name: 'Node 3', parent: '1', disabled: false },
+      { id: '4', name: 'Node 4', parent: '2', disabled: false },
+      { id: '5', name: 'Node 5', parent: undefined, disabled: false },
     ];
 
     it('should build the tree in ascending order by default', () => {
@@ -46,8 +46,8 @@ describe('Tree', () => {
 
     it('should handle rawNodes with missing parent references', () => {
       const nodesWithMissingParent: RawNode[] = [
-        { id: '1', name: 'Node 1', parent: undefined },
-        { id: '2', name: 'Node 2', parent: '3' }, // Parent "3" does not exist
+        { id: '1', name: 'Node 1', parent: undefined, disabled: false },
+        { id: '2', name: 'Node 2', parent: '3', disabled: false }, // Parent "3" does not exist
       ];
       const t = () => {
         new Tree(nodesWithMissingParent, TreeLevelOrderMode.Asc);
@@ -61,13 +61,13 @@ describe('Tree', () => {
     it('should return an array of expanded node IDs up to a specified depth', () => {
       const tree = new Tree(
         [
-          { id: '1', name: 'n1', parent: undefined },
-          { id: '2', name: 'n2', parent: '1' },
-          { id: '3', name: 'n3', parent: '1' },
-          { id: '4', name: 'n4', parent: undefined },
-          { id: '5', name: 'n5', parent: '4' },
-          { id: '6', name: 'n6', parent: '5' },
-          { id: '7', name: 'n7', parent: '6' },
+          { id: '1', name: 'n1', parent: undefined, disabled: false },
+          { id: '2', name: 'n2', parent: '1', disabled: false },
+          { id: '3', name: 'n3', parent: '1', disabled: false },
+          { id: '4', name: 'n4', parent: undefined, disabled: false },
+          { id: '5', name: 'n5', parent: '4', disabled: false },
+          { id: '6', name: 'n6', parent: '5', disabled: false },
+          { id: '7', name: 'n7', parent: '6', disabled: false },
         ],
         TreeLevelOrderMode.Asc
       );
@@ -97,11 +97,11 @@ describe('Tree', () => {
 
   describe('getPath function', () => {
     const sampleRawNodes: RawNode[] = [
-      { id: 'A', name: 'Node A' },
-      { id: 'B', parent: 'A', name: 'Node B' },
-      { id: 'C', parent: 'B', name: 'Node C' },
-      { id: 'D', parent: 'A', name: 'Node D' },
-      { id: 'E', parent: 'B', name: 'Node E' },
+      { id: 'A', name: 'Node A', disabled: false },
+      { id: 'B', parent: 'A', name: 'Node B', disabled: false },
+      { id: 'C', parent: 'B', name: 'Node C', disabled: false },
+      { id: 'D', parent: 'A', name: 'Node D', disabled: false },
+      { id: 'E', parent: 'B', name: 'Node E', disabled: false },
     ];
     const tree = new Tree(sampleRawNodes, TreeLevelOrderMode.Asc);
 

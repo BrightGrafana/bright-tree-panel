@@ -7,8 +7,8 @@ describe('Validator', () => {
     it('should throw error if ids are duplicated', () => {
       // arrange
       const input: RawNode[] = [
-        { id: '1', name: 'n1' },
-        { id: '1', name: 'n1' },
+        { id: '1', name: 'n1', disabled: false },
+        { id: '1', name: 'n1', disabled: false },
       ];
 
       // act
@@ -21,8 +21,8 @@ describe('Validator', () => {
     it('should throw error if ids are duplicated', () => {
       // arrange
       const input: RawNode[] = [
-        { id: '1', name: 'n1' },
-        { id: '2', name: 'n2', parent: '3' },
+        { id: '1', name: 'n1', disabled: false },
+        { id: '2', name: 'n2', parent: '3', disabled: false },
       ];
 
       // act
@@ -35,8 +35,8 @@ describe('Validator', () => {
     it('should throw error if parent matches id', () => {
       // arrange
       const input: RawNode[] = [
-        { id: '1', name: 'n1' },
-        { id: '2', name: 'n2', parent: '2' },
+        { id: '1', name: 'n1', disabled: false },
+        { id: '2', name: 'n2', parent: '2', disabled: false },
       ];
 
       // act
@@ -50,13 +50,14 @@ describe('Validator', () => {
     it('should throw error if detached branch is found', () => {
       // arrange
       const input: RawNode[] = [
-        { id: '1', name: 'n1', parent: undefined },
-        { id: '2', name: 'n2', parent: '3' },
-        { id: '3', name: 'n3', parent: '2' },
+        { id: '1', name: 'n1', parent: undefined, disabled: false },
+        { id: '2', name: 'n2', parent: '3', disabled: false },
+        { id: '3', name: 'n3', parent: '2', disabled: false },
       ];
 
       // act
-      const result = () => Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [] }]);
+      const result = () =>
+        Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [], disabled: false }]);
 
       // assert
       expect(result).toThrowError('Detached branch detected for id: 2');
@@ -78,6 +79,7 @@ describe('Validator', () => {
     idColumn: 'id',
     labelColumn: 'label',
     parentIdColumn: 'parentId',
+    disabledColumn: 'disabled',
     dashboardVariableName: 'myVar',
     multiSelect: true,
     orderLevels: TreeLevelOrderMode.Asc,
