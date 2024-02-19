@@ -4,19 +4,19 @@ import { PanelOptions, ToggleMode, TreeLevelOrderMode } from './models';
 
 export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((builder) => {
   return builder
-    .addTextInput({
+    .addFieldNamePicker({
       path: 'idColumn',
       name: 'Node id field name',
       description: 'Field name that contains the ids of nodes (every row in the table result is a node).',
       defaultValue: 'id',
     })
-    .addTextInput({
+    .addFieldNamePicker({
       path: 'labelColumn',
       name: 'Node label field name',
       description: 'Field name that contains the names of the nodes.',
       defaultValue: 'label',
     })
-    .addTextInput({
+    .addFieldNamePicker({
       path: 'parentIdColumn',
       name: 'Node parent id field name',
       description: 'Name of the field that contains the parent ids of the nodes.',
