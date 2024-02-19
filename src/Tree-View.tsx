@@ -218,8 +218,8 @@ export const TreeView = ({
 
   const escape = (event: any) => {
     if (event.key === 'Escape') {
-      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value').set;
-      nativeInputValueSetter.call(event.target, '');
+      const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
+      nativeInputValueSetter?.call(event.target, '');
       const onChangeEvent = new Event('input', { bubbles: true });
       event.target.dispatchEvent(onChangeEvent);
     }
