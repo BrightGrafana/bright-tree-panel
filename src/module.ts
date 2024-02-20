@@ -30,7 +30,8 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
     .addFieldNamePicker({
       path: 'disabledColumn',
       name: 'Node disabled field name',
-      description: 'Name of the field that indicates if nodes are disabled.',
+      description:
+        'Name of the field that indicates if nodes are disabled. Supports: boolean = true, string = true, both indicate disabled.',
       defaultValue: 'disabled',
       showIf(currentOptions) {
         return currentOptions.supportsDisabled;
