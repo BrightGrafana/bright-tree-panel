@@ -101,7 +101,10 @@ export class Utils {
         name: `${dfRow[labelColumn]}`,
         id: `${dfRow[idColumn]}`,
         parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
-        disabled: dfRow[disabledColumn] === true || dfRow[disabledColumn] === 'true' || dfRow[disabledColumn] === '1',
+        disabled:
+          dfRow[disabledColumn] === true ||
+          `${dfRow[disabledColumn]}`.toLowerCase() === 'true' ||
+          dfRow[disabledColumn] === '1',
         link: dataLinkUrl ? getTemplateSrv()?.replace(dataLinkUrl, tempScopedVars) : undefined,
       };
     });
