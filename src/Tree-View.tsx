@@ -147,7 +147,7 @@ export const TreeView = ({
               </span>
               <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
             </>
-          ) : options.hasDataLink ? (
+          ) : options.hasDataLink && (link ? `${link}` : '').trim() != '' ? (
             <a href={link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
               {label}
             </a>
