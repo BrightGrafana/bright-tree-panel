@@ -34,10 +34,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
   );
   Validator.validateTreeInput(queryResult);
 
-  const tree = React.useMemo(
-    () => new Tree(queryResult, options.orderLevels),
-    [queryResult, options.orderLevels, options.dataLinkUrl]
-  );
+  const tree = React.useMemo(() => new Tree(queryResult, options.orderLevels), [queryResult, options.orderLevels]);
 
   // Determine expanded nodes
   const expandedNodeIds: string[] = React.useMemo(

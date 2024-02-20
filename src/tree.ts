@@ -56,7 +56,7 @@ export class Tree {
    * @returns {string[]} An array of node IDs that are expanded.
    */
   getNodeIdsForDepth(maxDepth: number): string[] {
-    if (!maxDepth == undefined || maxDepth < 0) {
+    if (maxDepth === undefined || maxDepth < 0) {
       throw new ReferenceError('maxDepth should be positive number');
     }
 
