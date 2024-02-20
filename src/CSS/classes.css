@@ -28,3 +28,12 @@
   /* icon size */
   background-size: 14px;
 }
+
+.bright-tree-panel-table a {
+  color: rgb(110, 159, 255);
+}
+
+.bright-tree-panel-table a:hover {
+  text-decoration: underline;
+  color: rgb(110, 159, 255);
+}
