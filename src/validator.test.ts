@@ -1,6 +1,6 @@
 import { PanelData } from '@grafana/data';
 import { Validator } from 'validator';
-import { PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './models';
+import { ClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './models';
 
 describe('Validator', () => {
   describe('validateTreeInput', () => {
@@ -75,6 +75,7 @@ describe('Validator', () => {
   } as unknown as PanelData;
 
   const mockPanelOptions: PanelOptions = {
+    clickMode: ClickMode.SetVariable,
     displayedTreeDepth: 2,
     idColumn: 'id',
     labelColumn: 'label',
@@ -87,7 +88,6 @@ describe('Validator', () => {
     showItemCount: true,
     showSearch: true,
     toggleSelectMode: ToggleMode.SingleClick,
-    hasDataLink: false,
     dataLinkUrl: 'http://www.google.com',
     dataLinkNewTab: false,
   };
@@ -119,7 +119,7 @@ describe('Validator', () => {
 
       expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
         new ReferenceError(
-          "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+          "'Dashboard variable name' must be defined in panel options, when using Click mode set variable."
         )
       );
     });
@@ -129,9 +129,16 @@ describe('Validator', () => {
 
       expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).toThrow(
         new ReferenceError(
-          "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+          "'Dashboard variable name' must be defined in panel options, when using Click mode set variable."
         )
       );
+    });
+    it('should throw an error if Clickmode is DataLink and dashboardVariableName is missing', () => {
+      const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
+      invalidOptions['dashboardVariableName'] = undefined;
+      invalidOptions.clickMode = ClickMode.DataLink;
+
+      expect(() => Validator.validateOptionsInput(invalidOptions as PanelOptions, mockPanelData)).not.toThrow();
     });
 
     it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
