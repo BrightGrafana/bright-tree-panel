@@ -5,14 +5,19 @@ export enum ToggleMode {
   ChevronOnly = 'chevronOnly',
 }
 
+export enum ClickMode {
+  SetVariable = 'SetVariable',
+  DataLink = 'DataLink',
+}
+
 export type TreeViewOptions = {
+  clickMode: ClickMode;
   multiSelect: boolean;
   showItemCount: boolean;
   toggleMode: ToggleMode;
   supportsDisabled: boolean;
   showSearch: boolean;
   dashboardVariableName: string;
-  hasDataLink: boolean;
   dataLinkUrl: string;
   dataLinkNewTab: boolean;
 };

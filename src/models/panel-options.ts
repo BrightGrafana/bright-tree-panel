@@ -1,6 +1,7 @@
-import { ToggleMode, TreeLevelOrderMode } from './';
+import { ClickMode, ToggleMode, TreeLevelOrderMode } from './';
 
 export interface PanelOptions {
+  clickMode: ClickMode;
   multiSelect: boolean;
   orderLevels: TreeLevelOrderMode;
   idColumn: string;
@@ -13,7 +14,6 @@ export interface PanelOptions {
   showSearch: boolean;
   dashboardVariableName: string;
   toggleSelectMode: ToggleMode;
-  hasDataLink: boolean;
   dataLinkUrl: string;
   dataLinkNewTab: boolean;
 }

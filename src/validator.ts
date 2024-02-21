@@ -1,5 +1,5 @@
 import { PanelData } from '@grafana/data';
-import { RawNode, TreeNode, PanelOptions } from './models';
+import { RawNode, TreeNode, PanelOptions, ClickMode } from './models';
 import { Utils } from './utils';
 
 /**
@@ -78,9 +78,12 @@ export class Validator {
       );
     }
 
-    if (!options.dashboardVariableName || options.dashboardVariableName.trim() === '') {
+    if (
+      options.clickMode === ClickMode.SetVariable &&
+      (!options.dashboardVariableName || options.dashboardVariableName.trim() === '')
+    ) {
       throw new ReferenceError(
-        "'Dashboard variable name' must be defined in panel options, when using dashboard variable on click mode."
+        "'Dashboard variable name' must be defined in panel options, when using Click mode set variable."
       );
     }
 

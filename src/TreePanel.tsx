@@ -1,6 +1,6 @@
 import React from 'react';
 import { PanelProps } from '@grafana/data';
-import { PanelOptions, RawNode } from './models';
+import { ClickMode, PanelOptions, RawNode } from './models';
 import { Utils } from './utils';
 import { Validator } from './validator';
 import { TreeView } from './Tree-View';
@@ -20,7 +20,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
         options.parentIdColumn,
         options.labelColumn,
         options.disabledColumn,
-        options.hasDataLink ? options.dataLinkUrl : undefined
+        options.clickMode === ClickMode.DataLink ? options.dataLinkUrl : undefined
       ),
     [
       data,
@@ -28,7 +28,7 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
       options.parentIdColumn,
       options.labelColumn,
       options.disabledColumn,
-      options.hasDataLink,
+      options.clickMode,
       options.dataLinkUrl,
     ]
   );
@@ -47,13 +47,13 @@ export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data })
       <TreeView
         tree={tree}
         options={{
+          clickMode: options.clickMode,
           showItemCount: options.showItemCount,
           showSearch: options.showSearch,
           toggleMode: options.toggleSelectMode,
           multiSelect: options.multiSelect,
           supportsDisabled: options.supportsDisabled,
           dashboardVariableName: options.dashboardVariableName,
-          hasDataLink: options.hasDataLink,
           dataLinkUrl: options.dataLinkUrl,
           dataLinkNewTab: options.dataLinkNewTab,
         }}

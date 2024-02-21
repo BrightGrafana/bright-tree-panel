@@ -5,7 +5,7 @@ import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
 import { TreeView as XTreeView } from '@mui/x-tree-view/TreeView';
 import { TreeItem, TreeItemProps, useTreeItem, TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
-import { ToggleMode, TreeNode, TreeViewOptions } from './models';
+import { ClickMode, ToggleMode, TreeNode, TreeViewOptions } from './models';
 import { locationService } from '@grafana/runtime';
 import { Input } from '@grafana/ui';
 import { Tree } from 'tree';
@@ -118,8 +118,10 @@ export const TreeView = ({
         }
       }
 
-      console.log(`[handleNodeSelection] -> handleSelection()`);
-      handleSelection(event);
+      if (options.clickMode === ClickMode.SetVariable) {
+        console.log(`[handleNodeSelection] -> handleSelection()`);
+        handleSelection(event);
+      }
     };
 
     const startIndex = `${filter}`.length > 0 ? `${label}`.toLowerCase().indexOf(filter.toLowerCase()) : -1;
@@ -147,7 +149,7 @@ export const TreeView = ({
               </span>
               <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
             </>
-          ) : options.hasDataLink && !disabled && (link ? `${link}` : '').trim() !== '' ? (
+          ) : options.clickMode === ClickMode.DataLink && !disabled && (link ? `${link}` : '').trim() !== '' ? (
             <a href={link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
               {label}
             </a>
