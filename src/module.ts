@@ -117,7 +117,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       path: 'dataLinkUrl',
       name: 'Data link URL',
       description:
-        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for exaple: `${__data.fields.link:raw}${__data.fields.name:percentencode}`',
+        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for exaple: `${__data.fields.link:raw}${__data.fields.label:percentencode}`',
       category: ['Data Link'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.DataLink;
