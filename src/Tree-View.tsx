@@ -10,6 +10,26 @@ import { locationService } from '@grafana/runtime';
 import { Input } from '@grafana/ui';
 import { Tree } from 'tree';
 
+const Label = ({ label, filter }: { label: string | React.ReactNode; filter: string }) => {
+  const startIndex = `${filter}`.length > 0 ? `${label}`.toLowerCase().indexOf(filter.toLowerCase()) : -1;
+
+  return (
+    <>
+      {startIndex > -1 ? (
+        <>
+          <span>{`${label}`.slice(0, startIndex)}</span>
+          <span style={{ textDecoration: 'underline' }}>
+            {`${label}`.slice(startIndex, startIndex + `${filter}`.length)}
+          </span>
+          <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
+        </>
+      ) : (
+        label
+      )}
+    </>
+  );
+};
+
 export const TreeView = ({
   tree,
   options,
@@ -124,8 +144,6 @@ export const TreeView = ({
       }
     };
 
-    const startIndex = `${filter}`.length > 0 ? `${label}`.toLowerCase().indexOf(filter.toLowerCase()) : -1;
-
     return (
       <div
         className={clsx(className, classes.root, {
@@ -141,20 +159,12 @@ export const TreeView = ({
           {icon}
         </div>
         <Typography onClick={handleNodeSelection} component="div" className={classes.label}>
-          {startIndex > -1 ? (
-            <>
-              <span>{`${label}`.slice(0, startIndex)}</span>
-              <span style={{ textDecoration: 'underline' }}>
-                {`${label}`.slice(startIndex, startIndex + `${filter}`.length)}
-              </span>
-              <span>{`${label}`.slice(startIndex + `${filter}`.length)}</span>
-            </>
-          ) : options.clickMode === ClickMode.DataLink && !disabled && (link ? `${link}` : '').trim() !== '' ? (
+          {options.clickMode === ClickMode.DataLink && !disabled && (link ? `${link}` : '').trim() !== '' ? (
             <a href={link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
-              {label}
+              <Label label={label} filter={filter} />
             </a>
           ) : (
-            label
+            <Label label={label} filter={filter} />
           )}
         </Typography>
       </div>
