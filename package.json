@@ -1,6 +1,6 @@
 {
   "name": "tree",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "View data as tree",
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
