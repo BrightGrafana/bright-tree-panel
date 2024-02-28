@@ -21,7 +21,7 @@
       "type": "grafana",
       "id": "grafana",
       "name": "Grafana",
-      "version": "9.5.2"
+      "version": "10.0.0"
     },
     {
       "type": "datasource",
@@ -92,6 +92,60 @@
         }
       ],
       "title": "Panel Title",
+      "transformations": [
+        {
+          "id": "convertFieldType",
+          "options": {
+            "conversions": [
+              {
+                "destinationType": "time",
+                "targetField": "dates"
+              }
+            ],
+            "fields": {}
+          }
+        }
+      ],
+      "type": "equansdatahub-tree-panel"
+    },
+    {
+      "datasource": {
+        "type": "testdata",
+        "uid": "${DS_TESTDATA}"
+      },
+      "gridPos": {
+        "h": 21,
+        "w": 12,
+        "x": 12,
+        "y": 0
+      },
+      "id": 2,
+      "options": {
+        "clickMode": "DataLink",
+        "dataLinkNewTab": true,
+        "dataLinkUrl": "http://google.com?q=${__data.fields.label:percentencode}",
+        "displayedTreeDepth": 98,
+        "idColumn": "id",
+        "labelColumn": "label",
+        "orderLevels": "asc",
+        "parentIdColumn": "parent",
+        "showItemCount": false,
+        "showSearch": true,
+        "supportsDisabled": false,
+        "toggleSelectMode": "noTogle"
+      },
+      "targets": [
+        {
+          "csvContent": "id,label,parent, disabled\n1,Building,null, null\n2,Floor 1,1, true\n3,Room A,2, false\n4,Room B,2, \n5,Corridor 1,2, piet\n6,Room C,5,\n7,Room D,5,\n8,Floor 2,1, false\n9,Room E,8,\n10,Room F,8,\n11,Corridor 2,8,\n12,Room G,11,\n13,Room H,11,\n14,Floor 3,1, 1\n15,Room I,14,\n16,Room J,14,\n17,Corridor 3,14,\n18,Room K,17,\n19,Room L,17,\n20,Staircase A,1,\n21,Staircase B,1,\n22,Elevator A,1,\n23,Elevator B,1,\n24,Facilities,null,\n25,Lobby,24,\n26,Restroom,24,\n27,Cafeteria,24,\n28,Conference Room,24,\n29,Parking,null,\n30,Parking Lot 1,29,\n31,Parking Lot 2,29,\n32,Parking Lot 3,29,\n33,Parking Lot 4,29,\n34,Parking Lot 5,29,\n",
+          "datasource": {
+            "type": "testdata",
+            "uid": "${DS_TESTDATA}"
+          },
+          "refId": "A",
+          "scenarioId": "csv_content"
+        }
+      ],
+      "title": "Data Links",
       "transformations": [
         {
           "id": "convertFieldType",
