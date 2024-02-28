@@ -244,6 +244,7 @@ export const TreeView = ({
     } else {
       setTreeData(tree.getTree());
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [JSON.stringify(tree.getTree())]);
 
   const escape = (event: any) => {
