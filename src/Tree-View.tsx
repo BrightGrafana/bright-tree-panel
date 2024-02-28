@@ -234,6 +234,18 @@ export const TreeView = ({
   const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
   const [inSearch, setInSearch] = React.useState<boolean>(false);
 
+  // update tree view in Tree (query result) changes
+  React.useMemo(() => {
+    if (inSearch) {
+      const tempTree = tree.searchTree(filter);
+      setTreeData(() => tempTree);
+      // show search results fully expanded
+      setExpanded(() => getAllIds(tempTree));
+    } else {
+      setTreeData(tree.getTree());
+    }
+  }, [JSON.stringify(tree.getTree())]);
+
   const escape = (event: any) => {
     if (event.key === 'Escape') {
       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
