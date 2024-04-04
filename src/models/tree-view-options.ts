@@ -1,5 +1,5 @@
 export enum ToggleMode {
-  NoTogle = 'noTogle',
+  NoToggle = 'noToggle',
   ExpandOnly = 'expandOnly',
   SingleClick = 'singleClick',
   ChevronOnly = 'chevronOnly',

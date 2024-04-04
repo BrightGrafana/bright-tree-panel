@@ -1,5 +1,5 @@
-import { RawNode, TreeLevelOrderMode } from 'models';
-import { Tree } from 'tree';
+import { RawNode, TreeLevelOrderMode } from './models';
+import { Tree } from './tree';
 
 describe('Tree', () => {
   describe('Constructor', () => {

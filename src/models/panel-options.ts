@@ -1,4 +1,5 @@
-import { ClickMode, ToggleMode, TreeLevelOrderMode } from './';
+import {ClickMode, ToggleMode} from "./tree-view-options";
+import {TreeLevelOrderMode} from "./tree-level-order-mode";
 
 export interface PanelOptions {
   clickMode: ClickMode;

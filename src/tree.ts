@@ -1,5 +1,5 @@
-import { RawNode, TreeLevelOrderMode, TreeNode } from 'models';
-import { Validator } from 'validator';
+import { RawNode, TreeLevelOrderMode, TreeNode } from './models';
+import { Validator } from './validator';
 
 export class Tree {
   private tree: TreeNode[] = [];

@@ -3,12 +3,12 @@ import clsx from 'clsx';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { TreeView as XTreeView } from '@mui/x-tree-view/TreeView';
-import { TreeItem, TreeItemProps, useTreeItem, TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
+import { SimpleTreeView  } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem, TreeItemProps, useTreeItemState, TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
 import { ClickMode, ToggleMode, TreeNode, TreeViewOptions } from './models';
 import { locationService } from '@grafana/runtime';
 import { Input } from '@grafana/ui';
-import { Tree } from 'tree';
+import { Tree } from './tree';
 
 const Label = ({ label, filter }: { label: string | React.ReactNode; filter: string }) => {
   const startIndex = `${filter}`.length > 0 ? `${label}`.toLowerCase().indexOf(filter.toLowerCase()) : -1;
@@ -96,8 +96,8 @@ export const TreeView = ({
   }, [expandedNodes, dashboardVariableName, tree, options.toggleMode]);
 
   const CustomContent = React.forwardRef(function CustomContent(props: { link?: string } & TreeItemContentProps, ref) {
-    const { classes, className, label, link, nodeId, icon: iconProp, expansionIcon, displayIcon } = props;
-    const { disabled, expanded, selected, focused, handleSelection, preventSelection } = useTreeItem(nodeId);
+    const { classes, className, label, link, itemId, icon: iconProp, expansionIcon, displayIcon } = props;
+    const { disabled, expanded, selected, focused, handleSelection, preventSelection } = useTreeItemState(itemId);
     const icon = iconProp || expansionIcon || displayIcon;
 
     // prevent normale mouse handler
@@ -106,35 +106,35 @@ export const TreeView = ({
     };
 
     const handleChevronClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      console.log(options.toggleMode, ToggleMode.NoTogle);
-      if (options.toggleMode === ToggleMode.NoTogle) {
-        console.log(`[handleChevronClick] node ${nodeId} (no toggle)`);
+      console.log(options.toggleMode, ToggleMode.NoToggle);
+      if (options.toggleMode === ToggleMode.NoToggle) {
+        console.log(`[handleChevronClick] node ${itemId} (no toggle)`);
 
         return;
       }
 
       if (!expanded) {
-        console.log(`[handleChevronClick] expand node ${nodeId}`);
-        setExpanded([...expandedNodes, nodeId]);
+        console.log(`[handleChevronClick] expand node ${itemId}`);
+        setExpanded([...expandedNodes, itemId]);
       } else {
-        console.log(`[handleChevronClick] contract node ${nodeId}`);
-        setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== nodeId));
+        console.log(`[handleChevronClick] contract node ${itemId}`);
+        setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== itemId));
       }
     };
 
     const handleNodeSelection = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
-      if (options.toggleMode === ToggleMode.NoTogle || options.toggleMode === ToggleMode.ChevronOnly) {
-        console.log(`[handleLabelClick] node ${nodeId} (no label toggle)`);
+      if (options.toggleMode === ToggleMode.NoToggle || options.toggleMode === ToggleMode.ChevronOnly) {
+        console.log(`[handleLabelClick] node ${itemId} (no label toggle)`);
       } else {
         if (!expanded) {
-          console.log(`[handleLabelClick] expand node ${nodeId}`);
-          setExpanded([...expandedNodes, nodeId]);
+          console.log(`[handleLabelClick] expand node ${itemId}`);
+          setExpanded([...expandedNodes, itemId]);
           console.log(`[handleLabelClick] expanded nodes ${expandedNodes.join(', ')}`);
         } else if (expanded && options.toggleMode === ToggleMode.SingleClick) {
-          console.log(`[handleLabelClick] contract node ${nodeId}`);
-          setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== nodeId));
+          console.log(`[handleLabelClick] contract node ${itemId}`);
+          setExpanded(expandedNodes.filter((expandedNode) => expandedNode !== itemId));
         } else if (expanded && options.toggleMode === ToggleMode.ExpandOnly) {
-          console.log(`[handleLabelClick] node ${nodeId} (no label toggle - expand only)`);
+          console.log(`[handleLabelClick] node ${itemId} (no label toggle - expand only)`);
         }
       }
 
@@ -180,7 +180,7 @@ export const TreeView = ({
       return (
         <CustomTreeItem
           key={node.id}
-          nodeId={node.id}
+          itemId={node.id}
           label={`${node.name}${
             (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ''
           }`}
@@ -208,7 +208,7 @@ export const TreeView = ({
 
   // still needed for keyboard toggle
   const handleToggle = (event: React.SyntheticEvent, nodeIds: string[]) => {
-    if (options.toggleMode === ToggleMode.NoTogle) {
+    if (options.toggleMode === ToggleMode.NoToggle) {
       console.log(`[handleToggle] (no toggle)`);
 
       return;
@@ -310,19 +310,18 @@ export const TreeView = ({
         <tbody>
           <tr>
             <td>
-              <XTreeView
+              <SimpleTreeView
                 aria-label="controlled"
-                defaultCollapseIcon={<ExpandMoreIcon />}
-                defaultExpandIcon={<ChevronRightIcon />}
-                expanded={expandedNodes}
-                selected={selectedNodes}
-                onNodeToggle={handleToggle}
-                onNodeSelect={handleSelect}
+                slots={{  collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
+                expandedItems={expandedNodes}
+                selectedItems={selectedNodes}
+                onExpandedItemsChange={handleToggle}
+                onSelectedItemsChange={handleSelect}
                 multiSelect={options.multiSelect ? true : undefined}
                 disabledItemsFocusable={false}
               >
                 {renderTree(treeData)}
-              </XTreeView>
+              </SimpleTreeView>
             </td>
           </tr>
         </tbody>

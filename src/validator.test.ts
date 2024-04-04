@@ -1,5 +1,5 @@
 import { PanelData } from '@grafana/data';
-import { Validator } from 'validator';
+import { Validator } from './validator';
 import { ClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './models';
 
 describe('Validator', () => {

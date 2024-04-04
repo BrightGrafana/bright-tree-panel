@@ -4,7 +4,7 @@ import { ClickMode, PanelOptions, RawNode } from './models';
 import { Utils } from './utils';
 import { Validator } from './validator';
 import { TreeView } from './Tree-View';
-import { Tree } from 'tree';
+import { Tree } from './tree';
 import './CSS/classes.css';
 
 export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
