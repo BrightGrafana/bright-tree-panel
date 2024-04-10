@@ -3,7 +3,7 @@ version: '3.0'
 services:
   grafana:
     user: root
-    container_name: 'equans-sandbox-panel'
+    container_name: 'equansdatahub-tree-panel'
 
     platform: 'linux/amd64'
     build:
@@ -14,14 +14,14 @@ services:
     ports:
       - 3000:3000/tcp
     volumes:
-      - ./dist:/var/lib/grafana/plugins/equans-sandbox-panel
+      - ./dist:/var/lib/grafana/plugins/equansdatahub-tree-panel
       - ./provisioning:/etc/grafana/provisioning
-      - .:/root/equans-sandbox-panel
+      - .:/root/equansdatahub-tree-panel
 
     environment:
       NODE_ENV: development
-      GF_LOG_FILTERS: plugin.equans-sandbox-panel:debug
+      GF_LOG_FILTERS: plugin.equansdatahub-tree-panel:debug
       GF_LOG_LEVEL: debug
       GF_DATAPROXY_LOGGING: 1
-      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: equans-sandbox-panel
-      GF_PLUGINS_DELVE_ENABLED: true
+      GF_PLUGINS_ALLOW_LOADING_UNSIGNED_PLUGINS: equansdatahub-tree-panel
+      GF_PLUGINS_DELVE_ENABLED: 1

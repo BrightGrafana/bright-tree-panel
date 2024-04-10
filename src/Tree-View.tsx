@@ -295,7 +295,7 @@ export const TreeView = ({
 
   return (
     <>
-      <table className="bright-tree-panel-table">
+      <table className="equansdatahub-tree-panel-table">
         {options.showSearch ? (
           <thead>
             <tr>
