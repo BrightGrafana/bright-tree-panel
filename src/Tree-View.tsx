@@ -3,8 +3,8 @@ import clsx from 'clsx';
 import Typography from '@mui/material/Typography';
 import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
 import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import { SimpleTreeView  } from '@mui/x-tree-view/SimpleTreeView';
-import { TreeItem, TreeItemProps, useTreeItemState, TreeItemContentProps } from '@mui/x-tree-view/TreeItem';
+import { SimpleTreeView } from '@mui/x-tree-view/SimpleTreeView';
+import { TreeItem, TreeItemContentProps, TreeItemProps, useTreeItemState } from '@mui/x-tree-view/TreeItem';
 import { ClickMode, ToggleMode, TreeNode, TreeViewOptions } from './models';
 import { locationService } from '@grafana/runtime';
 import { Input } from '@grafana/ui';
@@ -55,7 +55,7 @@ export const TreeView = ({
   };
   const dashboardVariableName = React.useMemo(() => options.dashboardVariableName, [options.dashboardVariableName]);
 
-  // set inital selected based on url
+  // set initial selected based on url
   const providedNodeIds = getProvidedNodes(dashboardVariableName);
 
   const [expandedNodes, setExpanded] = React.useState<string[]>([
@@ -73,7 +73,7 @@ export const TreeView = ({
 
   React.useEffect(() => {
     const history = locationService.getHistory();
-    const unlisten = history.listen(() => {
+    return history.listen(() => {
       setSelected(() => {
         console.log('[history.listen] -> setSelected()');
         return getProvidedNodes(dashboardVariableName);
@@ -91,8 +91,6 @@ export const TreeView = ({
       console.log(`[history.listen] ${expandedNodes.join(', ')}`);
       setExpanded(tempExpandedNodes);
     });
-
-    return unlisten;
   }, [expandedNodes, dashboardVariableName, tree, options.toggleMode]);
 
   const CustomContent = React.forwardRef(function CustomContent(props: { link?: string } & TreeItemContentProps, ref) {
@@ -100,12 +98,12 @@ export const TreeView = ({
     const { disabled, expanded, selected, focused, handleSelection, preventSelection } = useTreeItemState(itemId);
     const icon = iconProp || expansionIcon || displayIcon;
 
-    // prevent normale mouse handler
+    // prevent default mouse handler
     const handleMouseDown = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       preventSelection(event);
     };
 
-    const handleChevronClick = (event: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
+    const handleChevronClick = (_: React.MouseEvent<HTMLDivElement, MouseEvent>) => {
       console.log(options.toggleMode, ToggleMode.NoToggle);
       if (options.toggleMode === ToggleMode.NoToggle) {
         console.log(`[handleChevronClick] node ${itemId} (no toggle)`);
@@ -263,7 +261,7 @@ export const TreeView = ({
     setFilter(query);
 
     if (!query) {
-      // deactivete serach mode: restore tree & restore expanded + posible new selection
+      // deactivate search mode: restore tree & restore expanded + possible new selection
       setInSearch(false);
       setTreeData(tree.getTree());
       setExpanded([
@@ -312,7 +310,7 @@ export const TreeView = ({
             <td>
               <SimpleTreeView
                 aria-label="controlled"
-                slots={{  collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
+                slots={{ collapseIcon: ExpandMoreIcon, expandIcon: ChevronRightIcon }}
                 expandedItems={expandedNodes}
                 selectedItems={selectedNodes}
                 onExpandedItemsChange={handleToggle}

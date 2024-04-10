@@ -1,5 +1,5 @@
 import { PanelData } from '@grafana/data';
-import { RawNode, TreeNode, PanelOptions, ClickMode } from '././models';
+import { RawNode, TreeNode, PanelOptions, ClickMode } from './models';
 import { Utils } from './utils';
 
 /**

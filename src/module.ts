@@ -83,7 +83,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       path: 'multiSelect',
       name: 'Allow multi select using Ctrl-Click or Shift-Click.',
       defaultValue: true,
-      category: ['Selection handeling'],
+      category: ['Selection handling'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.SetVariable;
       },
@@ -108,7 +108,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       name: 'Dashboard variable name',
       description: 'Name of the dashboard variable in which the id of the clicked node(s) is/are stored.',
       defaultValue: '',
-      category: ['Selection handeling'],
+      category: ['Selection handling'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.SetVariable;
       },
@@ -117,7 +117,7 @@ export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((
       path: 'dataLinkUrl',
       name: 'Data link URL',
       description:
-        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for exaple: `${__data.fields.link:raw}${__data.fields.label:percentencode}`',
+        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for example: `${__data.fields.link:raw}${__data.fields.label:percentage}`',
       category: ['Data Link'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.DataLink;

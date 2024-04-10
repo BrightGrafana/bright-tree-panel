@@ -1,4 +1,4 @@
-import { PanelData, DataFrameDTO, FieldType, MutableDataFrame, DataFrame } from '@grafana/data';
+import { createDataFrame, DataFrame, DataFrameDTO, FieldType, PanelData } from '@grafana/data';
 import { Utils } from './utils';
 
 describe('Utils', () => {
@@ -98,12 +98,12 @@ describe('Utils', () => {
       };
 
       const result = Utils.dfToNodeArray(
-        new MutableDataFrame(data),
+        createDataFrame(data),
         'id',
         'parentId',
         'label',
         'disabled',
-        'http://test.dev'
+        'https://test.dev'
       );
 
       expect(result).toEqual([

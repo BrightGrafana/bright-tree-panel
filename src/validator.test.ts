@@ -88,7 +88,7 @@ describe('Validator', () => {
     showItemCount: true,
     showSearch: true,
     toggleSelectMode: ToggleMode.SingleClick,
-    dataLinkUrl: 'http://www.google.com',
+    dataLinkUrl: 'https://www.google.com',
     dataLinkNewTab: false,
   };
 
@@ -133,7 +133,7 @@ describe('Validator', () => {
         )
       );
     });
-    it('should throw an error if Clickmode is DataLink and dashboardVariableName is missing', () => {
+    it('should throw an error if ClickMode is DataLink and dashboardVariableName is missing', () => {
       const invalidOptions = { ...mockPanelOptions } as Record<string, any>;
       invalidOptions['dashboardVariableName'] = undefined;
       invalidOptions.clickMode = ClickMode.DataLink;
@@ -179,7 +179,7 @@ describe('Validator', () => {
       }
     );
     it.each([['idColumn'], ['labelColumn'], ['parentIdColumn']])(
-      'should support cases insensative %s column',
+      'should support case insensitive %s column',
       (column: string) => {
         const validOptions = { ...mockPanelOptions } as Record<string, any>;
         validOptions[column] = validOptions[column].toUpperCase();

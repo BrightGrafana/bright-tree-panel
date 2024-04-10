@@ -5,7 +5,7 @@ import { Utils } from './utils';
 import { Validator } from './validator';
 import { TreeView } from './Tree-View';
 import { Tree } from './tree';
-import './CSS/classes.css';
+import './styles/classes.css';
 
 export const TreePanel: React.FC<PanelProps<PanelOptions>> = ({ options, data }) => {
   // validate options input before anything else
