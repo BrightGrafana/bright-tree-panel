@@ -1,5 +1,5 @@
 import { DataFrame, DataFrameView, PanelData, ScopedVars } from '@grafana/data';
-import { PanelOptions, RawNode } from './models';
+import { PanelOptions, RawNode } from './types';
 import { getTemplateSrv } from '@grafana/runtime';
 
 /**
@@ -41,13 +41,11 @@ export class Utils {
       ),
     }));
 
-    const modifiedResult: DataFrame = {
+    return {
       ...queryResult,
       length: nodeIds.length,
       fields: modifiedFields,
     };
-
-    return modifiedResult;
   }
   /**
    * Get the column names from the first series in a DataFrame.
@@ -69,6 +67,8 @@ export class Utils {
    * @param {string} idColumn - The name of the column containing node IDs.
    * @param {string} parentColumn - The name of the column containing parent node IDs.
    * @param {string} labelColumn - The name of the column containing node labels.
+   * @param {string} disabledColumn -
+   * @param {string} dataLinkUrl -
    * @returns {TreeNode[]} An array of Node objects.
    */
   static dfToNodeArray(

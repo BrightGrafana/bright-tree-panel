@@ -1,21 +1,3 @@
 {
-  "compilerOptions": {
-    "jsx": "react",
-    "alwaysStrict": true,
-    "declaration": false,
-    "rootDir": "./src",
-    "baseUrl": "./src",
-    "typeRoots": ["./node_modules/@types"],
-    "resolveJsonModule": true
-  },
-  "ts-node": {
-    "compilerOptions": {
-      "module": "commonjs",
-      "target": "es5",
-      "esModuleInterop": true
-    },
-    "transpileOnly": true
-  },
-  "include": ["./src", "./config/types"],
-  "extends": "@grafana/tsconfig"
+  "extends": "./.config/tsconfig.json"
 }

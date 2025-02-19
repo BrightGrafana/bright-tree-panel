@@ -1,4 +1,4 @@
-import { RawNode, TreeLevelOrderMode } from 'models';
+import { RawNode, TreeLevelOrderMode } from './types';
 import { Tree } from 'tree';
 
 describe('Tree', () => {
