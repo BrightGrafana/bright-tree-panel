@@ -1,6 +1,6 @@
 import { PanelData } from '@grafana/data';
 import { Validator } from 'validator';
-import { ClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './models';
+import { ClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './types';
 
 describe('Validator', () => {
   describe('validateTreeInput', () => {
@@ -15,7 +15,7 @@ describe('Validator', () => {
       const result = () => Validator.validateTreeInput(input);
 
       // assert
-      expect(result).toThrowError('Duplicated ID found for id: 1');
+      expect(result).toThrow('Duplicated ID found for id: 1');
     });
 
     it('should throw error if ids are duplicated', () => {
@@ -29,7 +29,7 @@ describe('Validator', () => {
       const result = () => Validator.validateTreeInput(input);
 
       // assert
-      expect(result).toThrowError('Parent not found for id 2 parent 3');
+      expect(result).toThrow('Parent not found for id 2 parent 3');
     });
 
     it('should throw error if parent matches id', () => {
@@ -43,7 +43,7 @@ describe('Validator', () => {
       const result = () => Validator.validateTreeInput(input);
 
       // assert
-      expect(result).toThrowError('Parent can not be mapped to itself. For id: 2');
+      expect(result).toThrow('Parent can not be mapped to itself. For id: 2');
     });
   });
   describe('validateTreeBranches', () => {
@@ -60,7 +60,7 @@ describe('Validator', () => {
         Validator.validateTreeBranches(input, [{ id: '1', name: 'n1', children: [], disabled: false }]);
 
       // assert
-      expect(result).toThrowError('Detached branch detected for id: 2');
+      expect(result).toThrow('Detached branch detected for id: 2');
     });
   });
 

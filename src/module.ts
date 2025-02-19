@@ -1,6 +1,6 @@
 import { PanelPlugin } from '@grafana/data';
-import { TreePanel } from './TreePanel';
-import { ClickMode, PanelOptions, ToggleMode, TreeLevelOrderMode } from './models';
+import { ClickMode, PanelOptions, ToggleMode, TreeLevelOrderMode } from './types';
+import { TreePanel } from './components/TreePanel';
 
 export const plugin = new PanelPlugin<PanelOptions>(TreePanel).setPanelOptions((builder) => {
   return builder

@@ -1,4 +1,4 @@
-import { RawNode, TreeLevelOrderMode, TreeNode } from 'models';
+import { RawNode, TreeLevelOrderMode, TreeNode } from './types';
 import { Validator } from 'validator';
 
 export class Tree {

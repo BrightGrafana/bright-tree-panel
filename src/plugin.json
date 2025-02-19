@@ -1,12 +1,10 @@
 {
-  "$schema": "https://raw.githubusercontent.com/grafana/grafana/master/docs/sources/developers/plugins/plugin.schema.json",
+  "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "panel",
   "name": "Interactive Tree Panel",
   "id": "equansdatahub-tree-panel",
   "info": {
-    "keywords": [
-      "panel"
-    ],
+    "keywords": ["panel"],
     "description": "View data, from a table data source, as a interactive tree like structure",
     "author": {
       "name": "Equans NL"
@@ -19,26 +17,26 @@
     "screenshots": [
       {
         "name": "Tree panel",
-        "path": "img/Screenshot tree.png"
+        "path": "img/screenshot-tree.png"
       },
       {
         "name": "Tree panel item count",
-        "path": "img/Screenshot tree item count.png"
+        "path": "img/screenshot-tree-item-count.png"
       },
       {
         "name": "Tree panel options",
-        "path": "img/Screenshot tree options.png"
+        "path": "img/screenshot-tree-options.png"
       },
       {
         "name": "Tree panel advanced options",
-        "path": "img/Screenshot tree advanced options.png"
+        "path": "img/screenshot-tree-advanced-options.png"
       }
     ],
     "version": "%VERSION%",
     "updated": "%TODAY%"
   },
   "dependencies": {
-    "grafanaDependency": ">=10.0.0",
+    "grafanaDependency": ">=10.4.0",
     "plugins": []
   }
 }
