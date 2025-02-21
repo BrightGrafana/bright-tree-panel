@@ -2,7 +2,11 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
-## [1.5.0](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.4.2...v1.5.0) (2025-02-19)
+## [1.5.1](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.4.2...v1.5.1) (2025-02-21)
+
+### Bug Fixes
+
+* in this release we now use the latest Grafana plugin template, upgraded the components used and support Grafana 10.4+
 
 ### [1.4.2](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.4.1...v1.4.2) (2024-02-28)
 
@@ -11,7 +15,7 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Features
 
-* add escapekey support on search input ([114dd13](https://github.com/BrightGrafana/bright-tree-panel/commit/114dd130a4a13d9bf9c60846ba137bac48915ec5)), closes [#13](https://github.com/BrightGrafana/bright-tree-panel/issues/13)
+* add escape key support on search input ([114dd13](https://github.com/BrightGrafana/bright-tree-panel/commit/114dd130a4a13d9bf9c60846ba137bac48915ec5)), closes [#13](https://github.com/BrightGrafana/bright-tree-panel/issues/13)
 * click mode, How interaction with the tree is handled ([6f8990b](https://github.com/BrightGrafana/bright-tree-panel/commit/6f8990b6eb73bd91331d3d574776ac5af9d55f50))
 * customizable toggle control option ([08ffd0e](https://github.com/BrightGrafana/bright-tree-panel/commit/08ffd0eeb9a0a61a8c2d749635c87a04bf95f7b3))
 * optional search bar ([7f03802](https://github.com/BrightGrafana/bright-tree-panel/commit/7f038028383326bafb93f589642b062fd0ccc995))
@@ -24,11 +28,11 @@ All notable changes to this project will be documented in this file. See [standa
 
 ### Bug Fixes
 
-* column names case insenative ([efb9745](https://github.com/BrightGrafana/bright-tree-panel/commit/efb9745ee8e4be3ba9de91c635122ec905d83c58)), closes [#21](https://github.com/BrightGrafana/bright-tree-panel/issues/21)
+* column names case insensitive ([efb9745](https://github.com/BrightGrafana/bright-tree-panel/commit/efb9745ee8e4be3ba9de91c635122ec905d83c58)), closes [#21](https://github.com/BrightGrafana/bright-tree-panel/issues/21)
 * disabled nodes should not show up as data links ([bcaef91](https://github.com/BrightGrafana/bright-tree-panel/commit/bcaef91108039428f0436c16a4354a1afba79793))
 * disabled to only support true and 'true' ([d27d431](https://github.com/BrightGrafana/bright-tree-panel/commit/d27d431915ec7e80e2b18c2d7c258e5b9dfc0654))
 * keep expanded state when updating dashboard var ([c4169ab](https://github.com/BrightGrafana/bright-tree-panel/commit/c4169abcc239a251daae3a51d84a9fca150cd2ae))
-* propperly handle toggle mode race trace ([d646f60](https://github.com/BrightGrafana/bright-tree-panel/commit/d646f6084dcfab04fe61c1222b8b0c7a56b28378))
+* properly handle toggle mode race trace ([d646f60](https://github.com/BrightGrafana/bright-tree-panel/commit/d646f6084dcfab04fe61c1222b8b0c7a56b28378))
 * search clear button ([26c2be6](https://github.com/BrightGrafana/bright-tree-panel/commit/26c2be6571ade6cc782b255aacae53b8fe685e43))
 * search results as data links ([5495d85](https://github.com/BrightGrafana/bright-tree-panel/commit/5495d85258e21c13be41aedcd8f9bfeb5d98f75d)), closes [#13](https://github.com/BrightGrafana/bright-tree-panel/issues/13)
 * select fields by field name picker ([eb11632](https://github.com/BrightGrafana/bright-tree-panel/commit/eb1163213af7ecbb600599985fc654468fa31dbc))
