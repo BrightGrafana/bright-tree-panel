@@ -2,7 +2,6 @@
   "name": "tree",
   "version": "1.5.1",
   "description": "View data as tree",
-
   "scripts": {
     "build": "webpack -c ./.config/webpack/webpack.config.ts --env production",
     "dev": "webpack -w -c ./.config/webpack/webpack.config.ts --env development",
@@ -71,10 +70,10 @@
     "@emotion/css": "11.10.6",
     "@emotion/react": "^11.14.0",
     "@emotion/styled": "^11.14.0",
-    "@grafana/data": "^11.5.1",
-    "@grafana/runtime": "^11.5.1",
-    "@grafana/schema": "^11.5.1",
-    "@grafana/ui": "^11.5.1",
+    "@grafana/data": "^11.5.2",
+    "@grafana/runtime": "^11.5.2",
+    "@grafana/schema": "^11.5.2",
+    "@grafana/ui": "^11.5.2",
     "@mui/material": "^6.4.4",
     "@mui/icons-material": "^6.4.4",
     "@mui/x-tree-view": "^8.0.0-alpha.11",
