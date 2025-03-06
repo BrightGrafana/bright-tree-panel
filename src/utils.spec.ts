@@ -1,10 +1,10 @@
-import { PanelData, DataFrameDTO, FieldType, MutableDataFrame, DataFrame } from '@grafana/data';
+import { DataFrame, FieldType, PanelData } from '@grafana/data';
 import { Utils } from './utils';
 import * as runtime from '@grafana/runtime';
 
 // Mock @grafana/runtime
 jest.mock('@grafana/runtime', () => ({
-  getTemplateSrv: jest.fn()
+  getTemplateSrv: jest.fn(),
 }));
 
 describe('Utils', () => {
@@ -30,9 +30,9 @@ describe('Utils', () => {
     });
 
     it('should throw an error when idColumn is not supplied', () => {
-      expect(() =>
-        Utils.extractSelectedTreeNodes({} as PanelData, ['nodeId'], undefined as any as string)
-      ).toThrow('Column name with node ids was not supplied when clicking tree nodes.');
+      expect(() => Utils.extractSelectedTreeNodes({} as PanelData, ['nodeId'], undefined as any as string)).toThrow(
+        'Column name with node ids was not supplied when clicking tree nodes.'
+      );
     });
 
     it('should throw an error when the idColumn is not found in the query result', () => {
@@ -102,22 +102,17 @@ describe('Utils', () => {
 
   describe('dfToNodeArray', () => {
     it('should map a DataFrame to an array of Node objects', () => {
-      const data: DataFrameDTO = {
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1', '2'], type: FieldType.string },
-          { name: 'parentId', values: [undefined, '1'], type: FieldType.string },
-          { name: 'label', values: ['Node 1', 'Node 2'], type: FieldType.string },
-          { name: 'disabled', values: [true, false], type: FieldType.boolean },
+          { name: 'id', values: ['1', '2'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined, '1'], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1', 'Node 2'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [true, false], type: FieldType.boolean, config: {} },
         ],
+        length: 2,
       };
 
-      const result = Utils.dfToNodeArray(
-        new MutableDataFrame(data),
-        'id',
-        'parentId',
-        'label',
-        'disabled'
-      );
+      const result = Utils.dfToNodeArray(df, 'id', 'parentId', 'label', 'disabled');
 
       expect(result).toEqual([
         { name: 'Node 1', id: '1', parent: undefined, disabled: true },
@@ -128,13 +123,13 @@ describe('Utils', () => {
 
   describe('dfToNodeArray with additionalData and dataLink', () => {
     const mockTemplateService = {
-      replace: jest.fn()
+      replace: jest.fn(),
     };
 
     beforeEach(() => {
       jest.clearAllMocks();
       (runtime.getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateService);
-      mockTemplateService.replace.mockImplementation(url => {
+      mockTemplateService.replace.mockImplementation((url) => {
         if (url.includes('${__data.fields.label}')) {
           return url.replace('${__data.fields.label}', 'Node 1');
         }
@@ -143,88 +138,70 @@ describe('Utils', () => {
     });
 
     it('should handle additionalColumns and include them in the result', () => {
-      const data: DataFrameDTO = {
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'], type: FieldType.string },
-          { name: 'parentId', values: [undefined], type: FieldType.string },
-          { name: 'label', values: ['Node 1'], type: FieldType.string },
-          { name: 'disabled', values: [false], type: FieldType.boolean },
-          { name: 'extraCol', values: ['extraValue'], type: FieldType.string },
+          { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
+          { name: 'extraCol', values: ['extraValue'], type: FieldType.string, config: {} },
         ],
+        length: 1,
       };
 
-      const result = Utils.dfToNodeArray(
-        new MutableDataFrame(data),
-        'id',
-        'parentId',
-        'label',
-        'disabled',
-        undefined,
-        ['extraCol']
-      );
+      const result = Utils.dfToNodeArray(df, 'id', 'parentId', 'label', 'disabled', undefined, ['extraCol']);
 
       expect(result[0].additionalData).toBeDefined();
       expect(result[0].additionalData?.extraCol).toBe('extraValue');
     });
 
     it('should handle empty or undefined values in additional columns', () => {
-      const data: DataFrameDTO = {
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'], type: FieldType.string },
-          { name: 'parentId', values: [undefined], type: FieldType.string },
-          { name: 'label', values: ['Node 1'], type: FieldType.string },
-          { name: 'disabled', values: [false], type: FieldType.boolean },
-          { name: 'extraCol', values: [undefined], type: FieldType.string },
+          { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
+          { name: 'extraCol', values: [undefined], type: FieldType.string, config: {} },
         ],
+        length: 1,
       };
 
-      const result = Utils.dfToNodeArray(
-        new MutableDataFrame(data),
-        'id',
-        'parentId',
-        'label',
-        'disabled',
-        undefined,
-        ['extraCol']
-      );
+      const result = Utils.dfToNodeArray(df, 'id', 'parentId', 'label', 'disabled', undefined, ['extraCol']);
 
       expect(result[0].additionalData).toBeDefined();
       expect(result[0].additionalData?.extraCol).toBe('');
     });
 
     it('should handle case-insensitive column name matching', () => {
-      const data: DataFrameDTO = {
+      const df: DataFrame = {
         fields: [
-          { name: 'ID', values: ['1'], type: FieldType.string },
-          { name: 'parentId', values: [undefined], type: FieldType.string },
-          { name: 'label', values: ['Node 1'], type: FieldType.string },
-          { name: 'disabled', values: [false], type: FieldType.boolean },
+          { name: 'ID', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
         ],
+        length: 1,
       };
 
-      const result = Utils.dfToNodeArray(
-        new MutableDataFrame(data),
-        'id',
-        'parentId',
-        'label',
-        'disabled'
-      );
+      const result = Utils.dfToNodeArray(df, 'id', 'parentId', 'label', 'disabled');
 
       expect(result[0].id).toBe('1');
     });
 
     it('should handle data link URL with template variables', () => {
-      const data = new MutableDataFrame({
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'] },
-          { name: 'parentId', values: [undefined] },
-          { name: 'label', values: ['Node 1'] },
-          { name: 'disabled', values: [false] },
+          { name: 'ID', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
         ],
-      });
+        length: 1,
+      };
 
       const result = Utils.dfToNodeArray(
-        data,
+        df,
         'id',
         'parentId',
         'label',
@@ -232,24 +209,28 @@ describe('Utils', () => {
         'http://test/${__data.fields.label}'
       );
 
-      expect(mockTemplateService.replace).toHaveBeenCalledWith('http://test/${__data.fields.label}', expect.any(Object));
+      expect(mockTemplateService.replace).toHaveBeenCalledWith(
+        'http://test/${__data.fields.label}',
+        expect.any(Object)
+      );
       expect(result[0].link).toBe('http://test/Node 1');
     });
 
     it('should handle missing template service', () => {
       (runtime.getTemplateSrv as jest.Mock).mockReturnValue(undefined);
 
-      const data = new MutableDataFrame({
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'] },
-          { name: 'parentId', values: [undefined] },
-          { name: 'label', values: ['Node 1'] },
-          { name: 'disabled', values: [false] },
+          { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
         ],
-      });
+        length: 1,
+      };
 
       const result = Utils.dfToNodeArray(
-        data,
+        df,
         'id',
         'parentId',
         'label',
@@ -270,7 +251,7 @@ describe('Utils', () => {
         },
         getVariables: () => [],
         containsTemplate: () => false,
-        updateTimeRange: () => {}
+        updateTimeRange: () => {},
       });
     });
 
@@ -280,14 +261,15 @@ describe('Utils', () => {
     });
 
     it('should properly handle template variables in data links', () => {
-      const df = new MutableDataFrame({
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'] },
-          { name: 'parentId', values: [null] },
-          { name: 'label', values: ['Node 1'] },
-          { name: 'disabled', values: [false] }
-        ]
-      });
+          { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
+        ],
+        length: 1,
+      };
 
       const result = Utils.dfToNodeArray(
         df,
@@ -305,14 +287,15 @@ describe('Utils', () => {
     it('should handle cases without template service', () => {
       (runtime.getTemplateSrv as jest.Mock).mockReturnValue(undefined);
 
-      const df = new MutableDataFrame({
+      const df: DataFrame = {
         fields: [
-          { name: 'id', values: ['1'] },
-          { name: 'parentId', values: [null] },
-          { name: 'label', values: ['Node 1'] },
-          { name: 'disabled', values: [false] }
-        ]
-      });
+          { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+          { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+          { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+          { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
+        ],
+        length: 1,
+      };
 
       const result = Utils.dfToNodeArray(
         df,
@@ -328,23 +311,24 @@ describe('Utils', () => {
   });
 
   describe('dfToNodeArray with links', () => {
-    const data = new MutableDataFrame({
+    const df: DataFrame = {
       fields: [
-        { name: 'id', values: ['1'] },
-        { name: 'parentId', values: [null] },
-        { name: 'label', values: ['Node 1'] },
-        { name: 'disabled', values: [false] }
-      ]
-    });
+        { name: 'id', values: ['1'], type: FieldType.string, config: {} },
+        { name: 'parentId', values: [undefined], type: FieldType.string, config: {} },
+        { name: 'label', values: ['Node 1'], type: FieldType.string, config: {} },
+        { name: 'disabled', values: [false], type: FieldType.boolean, config: {} },
+      ],
+      length: 1,
+    };
 
     it('should handle template variables in data links', () => {
       const mockTemplateService = {
-        replace: jest.fn(url => url.replace('${__data.fields.label}', 'Node 1'))
+        replace: jest.fn((url) => url.replace('${__data.fields.label}', 'Node 1')),
       };
       (runtime.getTemplateSrv as jest.Mock).mockReturnValue(mockTemplateService);
 
       const result = Utils.dfToNodeArray(
-        data,
+        df,
         'id',
         'parentId',
         'label',
@@ -360,7 +344,7 @@ describe('Utils', () => {
       (runtime.getTemplateSrv as jest.Mock).mockReturnValue(undefined);
 
       const result = Utils.dfToNodeArray(
-        data,
+        df,
         'id',
         'parentId',
         'label',
