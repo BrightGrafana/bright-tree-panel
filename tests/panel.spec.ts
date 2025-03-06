@@ -9,7 +9,7 @@ test('should display sample data', async ({ gotoPanelEditPage, readProvisionedDa
 test('should display search when enabled', async ({ gotoPanelEditPage, readProvisionedDashboard, page }) => {
   const dashboard = await readProvisionedDashboard({ fileName: 'dashboard.json' });
   const panelEditPage = await gotoPanelEditPage({ dashboard, id: '1' });
-  const options = panelEditPage.getCustomOptions('Search');
+  const options = panelEditPage.getCustomOptions('Search options');
   const showSearch = options.getSwitch('Show Search');
   await showSearch.check();
   await expect(page.getByTestId('search-input')).toBeVisible();
@@ -18,7 +18,7 @@ test('should display search when enabled', async ({ gotoPanelEditPage, readProvi
 test('should hide search when disabled', async ({ gotoPanelEditPage, readProvisionedDashboard, page }) => {
   const dashboard = await readProvisionedDashboard({ fileName: 'dashboard.json' });
   const panelEditPage = await gotoPanelEditPage({ dashboard, id: '1' });
-  const options = panelEditPage.getCustomOptions('Search');
+  const options = panelEditPage.getCustomOptions('Search options');
   const showSearch = options.getSwitch('Show Search');
   await showSearch.uncheck();
   await expect(page.getByTestId('search-input')).not.toBeVisible();
