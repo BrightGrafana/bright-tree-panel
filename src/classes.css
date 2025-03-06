@@ -88,7 +88,6 @@
 
 .bright-tree-panel-table .mapped-value {
     display: inline-block !important;
-    width: 100%;
 }
 
 .bright-tree-panel-table .mapped-value span {
@@ -98,14 +97,12 @@
 
 .bright-tree-panel-table .mapped-value-inner {
     display: inline-block !important;
-    width: 100%;
     color: inherit;
 }
 
 /* higher specificity selector to override Grafana defaults */
 .bright-tree-panel-table td .mapped-value .mapped-value-inner {
     display: inline-block !important;
-    width: 100%;
 }
 
 /* ensure no other styles override our color */
