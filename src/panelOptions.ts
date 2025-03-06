@@ -8,39 +8,46 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
   return builder
     .addFieldNamePicker({
       path: 'idColumn',
-      name: 'Node id field name',
-      description: 'Field name that contains the ids of nodes (every row in the table result is a node).',
+      name: 'Node ID field name',
+      description: 'Every row of data results in a node. Set the field containing the ID of the node.',
       defaultValue: 'id',
+      category: ['Tree options'],
     })
     .addFieldNamePicker({
       path: 'labelColumn',
       name: 'Node label field name',
-      description: 'Field name that contains the names of the nodes.',
+      description: 'Set the field that will be used to render the label of the node.',
       defaultValue: 'label',
+      category: ['Tree options'],
     })
     .addFieldNamePicker({
       path: 'parentIdColumn',
-      name: 'Node parent id field name',
-      description: 'Name of the field that contains the parent ids of the nodes.',
+      name: 'Node parent ID field name',
+      description: 'Set the field that contains the parent ID of the nodes.',
       defaultValue: 'parent',
+      category: ['Tree options'],
     })
     .addTextInput({
       path: 'additionalColumns',
-      name: 'Additional Columns',
-      description: 'Comma separated list of extra column names to display.',
+      name: 'Additional fields',
+      description: 'Comma separated list of extra field names to display. This will transform the tree into a table.',
       defaultValue: '',
+      category: ['Tree options'],
     })
     .addBooleanSwitch({
       path: 'supportsDisabled',
       name: 'Support disabled nodes',
+      description: 'Disabled nodes will be displayed greyed-out and are neither selectable nor expandable.',
       defaultValue: false,
+      category: ['Tree options'],
     })
     .addFieldNamePicker({
       path: 'disabledColumn',
       name: 'Node disabled field name',
       description:
-        'Name of the field that indicates if nodes are disabled. Supports: boolean = true, string = true, both indicate disabled.',
+        'Set the field that indicates if a node is disabled. Supports: boolean = true, string = true, both indicating a disabled node.',
       defaultValue: 'disabled',
+      category: ['Tree options'],
       showIf(currentOptions) {
         return currentOptions.supportsDisabled;
       },
@@ -48,50 +55,16 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
     .addNumberInput({
       path: 'displayedTreeDepth',
       name: 'Expanded levels',
-      description: 'Number of levels expanded by default. Applied after save and apply (page refresh).',
+      description: 'Number of levels that are initially expanded. Applied after save and apply (page refresh).',
       defaultValue: 100,
+      category: ['Tree options'],
     })
     .addBooleanSwitch({
       path: 'showItemCount',
       name: 'Show item count',
+      description: 'Display the number of first-level child nodes between parenthesis after the label.',
       defaultValue: false,
-    })
-    .addBooleanSwitch({
-      path: 'showSearch',
-      name: 'Show Search',
-      defaultValue: false,
-      category: ['Search'],
-    })
-    .addTextInput({
-      path: 'searchPlaceholder',
-      name: 'Search input placeholder text',
-      description: 'Placeholder text to display in the search input field.',
-      defaultValue: 'Search',
-      category: ['Search'],
-      showIf(currentOptions) {
-        return currentOptions.showSearch;
-      },
-    })
-    .addBooleanSwitch({
-      path: 'showIconFilter',
-      name: 'Show icon filter',
-      description: 'This switch will filter on nodes containing icons and their parents.',
-      defaultValue: false,
-      category: ['Search'],
-      showIf(currentOptions) {
-        return currentOptions.showSearch;
-      },
-    })
-    .addTextInput({
-      path: 'iconFilterLabel',
-      name: 'Icon filter label',
-      description: 'Label to display for this toggle',
-      defaultValue: 'Alerts only',
-      category: ['Search'],
-      showIf(currentOptions) {
-        return currentOptions.showSearch && currentOptions.showIconFilter;
-      },
-
+      category: ['Tree options'],
     })
     .addRadio({
       path: 'orderLevels',
@@ -104,15 +77,44 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
           { value: TreeLevelOrderMode.Source, label: 'Source' },
         ],
       },
+      category: ['Tree options']
     })
     .addBooleanSwitch({
-      path: 'multiSelect',
-      name: 'Allow multi select using Ctrl-Click or Shift-Click.',
-      defaultValue: true,
-      category: ['Selection handling'],
+      path: 'showSearch',
+      name: 'Show Search',
+      defaultValue: false,
+      category: ['Search options'],
+    })
+    .addTextInput({
+      path: 'searchPlaceholder',
+      name: 'Search input placeholder text',
+      description: 'Placeholder text to display in the search input field.',
+      defaultValue: 'Search',
+      category: ['Search options'],
       showIf(currentOptions) {
-        return currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both;
+        return currentOptions.showSearch;
       },
+    })
+    .addBooleanSwitch({
+      path: 'showIconFilter',
+      name: 'Icon filter',
+      description: 'Enables a toggle button that will filter on nodes containing icons and their parents.',
+      defaultValue: false,
+      category: ['Search options'],
+      showIf(currentOptions) {
+        return currentOptions.showSearch;
+      },
+    })
+    .addTextInput({
+      path: 'iconFilterLabel',
+      name: 'Icon filter label',
+      description: 'Label to display for this toggle button.',
+      defaultValue: 'Alerts only',
+      category: ['Search options'],
+      showIf(currentOptions) {
+        return currentOptions.showSearch && currentOptions.showIconFilter;
+      },
+
     })
     .addSelect({
       path: 'toggleSelectMode',
@@ -128,6 +130,17 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
           { value: ToggleMode.NoTogle, label: 'No Toggle' },
         ],
       },
+      category: ['Toggle and select options'],
+    })
+    .addBooleanSwitch({
+      path: 'multiSelect',
+      name: 'Allow multi select using Ctrl-Click or Shift-Click.',
+      description: 'Select different nodes by holding down the Ctrl key or visible ranges using the Shift key.',
+      defaultValue: true,
+      category: ['Toggle and select options'],
+      showIf(currentOptions) {
+        return currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both;
+      },
     })
     .addSelect({
       path: 'clickMode',
@@ -142,14 +155,14 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
           { value: ClickMode.Both, label: 'Both' },
         ],
       },
-      category: ['Selection handling'],
+      category: ['Toggle and select options'],
     })
     .addTextInput({
       path: 'dashboardVariableName',
       name: 'Dashboard variable name',
       description: 'Name of the dashboard variable in which the id of the clicked node(s) is/are stored.',
       defaultValue: '',
-      category: ['Selection handling'],
+      category: ['Toggle and select options'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both;
       },
@@ -158,8 +171,8 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       path: 'dataLinkUrl',
       name: 'Data link URL',
       description:
-        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for example: `${__data.fields.link:raw}${__data.fields.label:percentencode}`',
-      category: ['Selection handling'],
+        'URL to open when a node is clicked. Use the `__data` variable to access the node data. for example: `${__data.fields.link:raw}${__data.fields.label:percentencode}`.',
+      category: ['Toggle and select options'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.DataLink || currentOptions.clickMode === ClickMode.Both;
       },
@@ -167,8 +180,9 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
     .addBooleanSwitch({
       path: 'dataLinkNewTab',
       name: 'Open in new tab',
+      description: 'When selected, clicking a link will open in a new tab instead of navigating away.',
       defaultValue: false,
-      category: ['Selection handling'],
+      category: ['Toggle and select options'],
       showIf(currentOptions) {
         return currentOptions.clickMode === ClickMode.DataLink || currentOptions.clickMode === ClickMode.Both;
       },
@@ -176,21 +190,32 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
     .addBooleanSwitch({
       path: 'showGridLines',
       name: 'Show grid lines',
+      description: 'When selected, the grid lines will be visible.',
       defaultValue: false,
-      category: ['Appearance'],
+      category: ['Table options'],
     })
     .addBooleanSwitch({
       path: 'showColumnHeaders',
       name: 'Show column headers',
+      description: 'When selected, the column headers will be visible.',
       defaultValue: false,
-      category: ['Appearance'],
+      category: ['Table options'],
     })
     .addBooleanSwitch({
       path: 'compactMode',
       name: 'Compact mode',
       description: 'Reduce the amount of space around table cells to make the table more compact.',
       defaultValue: true,
-      category: ['Appearance'],
+      category: ['Table options'],
+    })
+    .addCustomEditor({
+      id: 'valueMappings',
+      path: 'valueMappings',
+      name: 'Value mappings',
+      description: 'Map values to text and/or colors using one or more mappings.',
+      defaultValue: {},
+      editor: ValueMappingsEditor,
+      category: ['Value mapping'],
     })
     .addFieldNamePicker({
       path: 'iconColumn',
@@ -202,7 +227,7 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       id: 'iconMappings',
       path: 'iconMappings',
       name: 'Value to icon mappings',
-      description: 'Map values to icons',
+      description: 'Map values to icons using one or more mappings.',
       defaultValue: {
         valueMappings: [
           {
@@ -231,7 +256,7 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       id: 'iconColorMappings',
       path: 'iconColorMappings',
       name: 'Value to icon color mappings',
-      description: 'Map values to icon colors',
+      description: 'Map values to icon colors using one or more mappings.',
       defaultValue: {
         valueMappings: [
           {
@@ -257,7 +282,7 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       id: 'parentIconMappings',
       path: 'parentIconMappings',
       name: 'Parent icon map condition(s)',
-      description: 'Map values to parent icons',
+      description: 'Map values to parent icons using one or more mappings.',
       defaultValue: {
         valueMappings: [
           {
@@ -286,7 +311,7 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       id: 'parentIconColorMappings',
       path: 'parentIconColorMappings',
       name: 'Parent icon color map condition(s)',
-      description: 'Map values to parent icon colors',
+      description: 'Map values to parent icon colors using one or more mappings.',
       defaultValue: {
         valueMappings: [
           {
@@ -339,13 +364,5 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
         return (currentOptions.iconColumn?.length ?? 0) > 0 && currentOptions.iconClickMode !== IconClickMode.DoNothing;
       },
     })
-    .addCustomEditor({
-      id: 'valueMappings',
-      path: 'valueMappings',
-      name: 'Value mappings',
-      description: 'Map values to text and colors',
-      defaultValue: {},
-      editor: ValueMappingsEditor,
-      category: ['Value Mappings'],
-    });
+
 }

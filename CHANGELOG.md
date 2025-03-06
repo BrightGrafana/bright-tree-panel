@@ -2,6 +2,12 @@
 
 All notable changes to this project will be documented in this file. See [standard-version](https://github.com/conventional-changelog/standard-version) for commit guidelines.
 
+## [1.6.0](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.5.1...v1.6.0) (2025-03-27)
+
+### Features
+
+* in this release we added support for additional columns, value mappings and icons
+
 ## [1.5.1](https://github.com/BrightGrafana/bright-tree-panel/compare/v1.4.2...v1.5.1) (2025-02-21)
 
 ### Bug Fixes

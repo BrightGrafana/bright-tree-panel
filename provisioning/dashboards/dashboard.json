@@ -35,32 +35,114 @@
       },
       "id": 1,
       "options": {
-        "seriesCountSize": "sm",
-        "showSeriesCount": false,
-        "text": "Default value of text input option",
-        "clickMode": "SetVariable",
+        "additionalColumns": "level",
+        "clickMode": "Both",
+        "compactMode": false,
         "dashboardVariableName": "Placeholder",
+        "dataLinkNewTab": true,
+        "dataLinkUrl": "http://www.google.com?q=${__data.fields.label:raw}",
         "disabledColumn": "disabled",
         "displayedTreeDepth": 1,
+        "iconClickMode": "select",
+        "iconClickTooltip": "Click to select all alerts in this node",
+        "iconColorColumn": "level",
+        "iconColorMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "color": "#FF780A",
+                "text": ""
+              },
+              "type": "value",
+              "value": "5"
+            },
+            {
+              "result": {
+                "color": "#E02F44",
+                "text": ""
+              },
+              "type": "value",
+              "value": "10"
+            }
+          ]
+        },
+        "iconColumn": "level",
+        "iconFilterLabel": "Show alerts only",
+        "iconMappings": {
+          "valueMappings": [
+            {
+              "from": 1,
+              "result": {
+                "text": "bell"
+              },
+              "to": 10,
+              "type": "range"
+            }
+          ]
+        },
         "idColumn": "id",
         "labelColumn": "label",
         "multiSelect": true,
         "orderLevels": "asc",
+        "parentIconColorColumn": "level",
+        "parentIconColorMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "color": "#E02F44",
+                "text": ""
+              },
+              "type": "value",
+              "value": "10"
+            }
+          ]
+        },
+        "parentIconColumn": "level",
+        "parentIconMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "text": "shield-exclamation"
+              },
+              "type": "value",
+              "value": "10"
+            }
+          ]
+        },
         "parentIdColumn": "parent",
+        "searchPlaceholder": "Search values",
+        "seriesCountSize": "sm",
+        "showColumnHeaders": false,
+        "showGridLines": true,
+        "showIconFilter": true,
         "showItemCount": false,
         "showSearch": true,
+        "showSeriesCount": false,
         "supportsDisabled": true,
-        "toggleSelectMode": "expandOnly"
+        "text": "Default value of text input option",
+        "toggleSelectMode": "expandOnly",
+        "valueMappings": {
+          "label": [
+            {
+              "result": {
+                "color": "#A352CC",
+                "text": ""
+              },
+              "type": "value",
+              "value": "%room%"
+            }
+          ]
+        }
       },
       "targets": [
         {
+          "csvContent": "id,label,parent,level,disabled\n1,Building,null,0,null\n2,Floor 1,1,0,true\n3,Room A,2,5,false\n4,Room B,2,5,\n5,Corridor 1,2,0,false\n6,Room C,5,0,\n7,Room D,5,0,\n8,Floor 2,1,0,false\n9,Room E,8,5,\n10,Room F,8,0,\n11,Corridor 2,8,0,\n12,Room G,11,10,\n13,Room H,11,0,\n14,Floor 3,1,0,1\n15,Room I,14,5,\n16,Room J,14,5,\n17,Corridor 3,14,0,\n18,Room K,17,0,\n19,Room L,17,0,\n20,Staircase A,1,0,\n21,Staircase B,1,10,\n22,Elevator A,1,0,\n23,Elevator B,1,0,\n24,Facilities,null,0,\n25,Lobby,24,0,\n26,Restroom,24,0,\n27,Cafeteria,24,0,\n28,Conference Room,24,0,\n29,Parking,null,0,\n30,Parking Lot 1,29,5,\n31,Parking Lot 2,29,10,\n32,Parking Lot 3,29,10,\n33,Parking Lot 4,29,0,\n34,Parking Lot 5,29,0,\n",
           "datasource": {
             "type": "grafana-testdata-datasource",
             "uid": "db84e60d-b92a-4089-82cb-34842fb1754b"
           },
           "refId": "A",
-          "scenarioId": "csv_content",
-          "csvContent": "id,label,parent, disabled\n1,Building,null, null\n2,Floor 1,1, true\n3,Room A,2, false\n4,Room B,2, \n5,Corridor 1,2, piet\n6,Room C,5,\n7,Room D,5,\n8,Floor 2,1, false\n9,Room E,8,\n10,Room F,8,\n11,Corridor 2,8,\n12,Room G,11,\n13,Room H,11,\n14,Floor 3,1, 1\n15,Room I,14,\n16,Room J,14,\n17,Corridor 3,14,\n18,Room K,17,\n19,Room L,17,\n20,Staircase A,1,\n21,Staircase B,1,\n22,Elevator A,1,\n23,Elevator B,1,\n24,Facilities,null,\n25,Lobby,24,\n26,Restroom,24,\n27,Cafeteria,24,\n28,Conference Room,24,\n29,Parking,null,\n30,Parking Lot 1,29,\n31,Parking Lot 2,29,\n32,Parking Lot 3,29,\n33,Parking Lot 4,29,\n34,Parking Lot 5,29,\n"
+          "scenarioId": "csv_content"
         }
       ],
       "title": "Sample Data",
@@ -78,7 +160,7 @@
           }
         }
       ],
-      "type": "equansdatahub-tree-panel-dev"
+      "type": "equansdatahub-tree-panel"
     },
     {
       "datasource": {
@@ -93,31 +175,92 @@
       },
       "id": 2,
       "options": {
-        "seriesCountSize": "sm",
-        "showSeriesCount": false,
-        "text": "Default value of text input option",
+        "additionalColumns": "",
         "clickMode": "DataLink",
+        "compactMode": true,
+        "dashboardVariableName": "",
         "dataLinkNewTab": true,
         "dataLinkUrl": "http://google.com?q=${__data.fields.label:percentencode}",
+        "disabledColumn": "disabled",
         "displayedTreeDepth": 98,
+        "iconClickMode": "doNothing",
+        "iconClickTooltip": "",
+        "iconColorColumn": "",
+        "iconColorMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "text": ""
+              },
+              "type": "value",
+              "value": ""
+            }
+          ]
+        },
+        "iconColumn": "",
+        "iconFilterLabel": "Alerts only",
+        "iconMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "text": "check-square"
+              },
+              "type": "value",
+              "value": ""
+            }
+          ]
+        },
         "idColumn": "id",
         "labelColumn": "label",
+        "multiSelect": true,
         "orderLevels": "asc",
+        "parentIconColorColumn": "",
+        "parentIconColorMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "text": ""
+              },
+              "type": "value",
+              "value": ""
+            }
+          ]
+        },
+        "parentIconColumn": "",
+        "parentIconMappings": {
+          "valueMappings": [
+            {
+              "result": {
+                "text": "check-square"
+              },
+              "type": "value",
+              "value": ""
+            }
+          ]
+        },
         "parentIdColumn": "parent",
+        "searchPlaceholder": "Search",
+        "seriesCountSize": "sm",
+        "showColumnHeaders": false,
+        "showGridLines": false,
+        "showIconFilter": false,
         "showItemCount": false,
         "showSearch": true,
+        "showSeriesCount": false,
         "supportsDisabled": false,
-        "toggleSelectMode": "noTogle"
+        "text": "Default value of text input option",
+        "toggleSelectMode": "noTogle",
+        "valueMappings": {}
       },
       "targets": [
         {
+          "csvContent": "id,label,parent, disabled\n1,Building,null, null\n2,Floor 1,1, true\n3,Room A,2, false\n4,Room B,2, \n5,Corridor 1,2, piet\n6,Room C,5,\n7,Room D,5,\n8,Floor 2,1, false\n9,Room E,8,\n10,Room F,8,\n11,Corridor 2,8,\n12,Room G,11,\n13,Room H,11,\n14,Floor 3,1, 1\n15,Room I,14,\n16,Room J,14,\n17,Corridor 3,14,\n18,Room K,17,\n19,Room L,17,\n20,Staircase A,1,\n21,Staircase B,1,\n22,Elevator A,1,\n23,Elevator B,1,\n24,Facilities,null,\n25,Lobby,24,\n26,Restroom,24,\n27,Cafeteria,24,\n28,Conference Room,24,\n29,Parking,null,\n30,Parking Lot 1,29,\n31,Parking Lot 2,29,\n32,Parking Lot 3,29,\n33,Parking Lot 4,29,\n34,Parking Lot 5,29,\n",
           "datasource": {
             "type": "grafana-testdata-datasource",
             "uid": "db84e60d-b92a-4089-82cb-34842fb1754b"
           },
           "refId": "A",
-          "scenarioId": "csv_content",
-          "csvContent": "id,label,parent, disabled\n1,Building,null, null\n2,Floor 1,1, true\n3,Room A,2, false\n4,Room B,2, \n5,Corridor 1,2, piet\n6,Room C,5,\n7,Room D,5,\n8,Floor 2,1, false\n9,Room E,8,\n10,Room F,8,\n11,Corridor 2,8,\n12,Room G,11,\n13,Room H,11,\n14,Floor 3,1, 1\n15,Room I,14,\n16,Room J,14,\n17,Corridor 3,14,\n18,Room K,17,\n19,Room L,17,\n20,Staircase A,1,\n21,Staircase B,1,\n22,Elevator A,1,\n23,Elevator B,1,\n24,Facilities,null,\n25,Lobby,24,\n26,Restroom,24,\n27,Cafeteria,24,\n28,Conference Room,24,\n29,Parking,null,\n30,Parking Lot 1,29,\n31,Parking Lot 2,29,\n32,Parking Lot 3,29,\n33,Parking Lot 4,29,\n34,Parking Lot 5,29,\n"
+          "scenarioId": "csv_content"
         }
       ],
       "title": "Sample Data Links",
@@ -135,7 +278,7 @@
           }
         }
       ],
-      "type": "equansdatahub-tree-panel-dev"
+      "type": "equansdatahub-tree-panel"
     }
   ],
   "refresh": "",

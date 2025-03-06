@@ -1,7 +1,7 @@
 services:
   grafana:
     user: root
-    container_name: 'equansdatahub-tree-panel-dev'
+    container_name: 'equansdatahub-tree-panel'
 
     build:
       context: .
