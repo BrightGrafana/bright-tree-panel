@@ -87,6 +87,15 @@ export class Validator {
       );
     }
 
+    if (
+      options.clickMode === ClickMode.Both &&
+      (!options.dashboardVariableName || options.dashboardVariableName.trim() === '')
+    ) {
+      throw new ReferenceError(
+        "'Dashboard variable name' must be defined in panel options, when using Click mode both."
+      );
+    }
+
     // Validate column names
     const colNames = Utils.getDataFrameColumnNames(data).map((colName) => colName.toLowerCase().trim());
     const requiredColumns = [

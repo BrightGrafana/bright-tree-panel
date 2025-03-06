@@ -11,7 +11,7 @@ export class Utils {
    *
    * @param {PanelData} data - The PanelData object containing the query result.
    * @param {string[]} nodeIds - An array of node IDs that were selected in the tree.
-   * @param {PanelOptions["idColumn"]} idColumn - The name of the query field that contains the node IDs.
+   * @param {PanelOptions['idColumn']} idColumn - The name of the query field that contains the node IDs.
    * @returns {DataFrame} - A DataFrame containing only the rows corresponding to the selected nodes.
    * @throws {Error} - Throws an error if required parameters are not supplied or if the specified column is not found.
    */
@@ -36,7 +36,7 @@ export class Utils {
 
     const modifiedFields: any[] = queryResult.fields.map((field) => ({
       ...field,
-      values: field.values.filter((value, index) =>
+      values: field.values.filter((_, index) =>
         nodeIds.includes(`${queryResult.fields[nodeIdFieldIndex].values[index]}`)
       ),
     }));
@@ -47,6 +47,7 @@ export class Utils {
       fields: modifiedFields,
     };
   }
+
   /**
    * Get the column names from the first series in a DataFrame.
    *
@@ -69,6 +70,7 @@ export class Utils {
    * @param {string} labelColumn - The name of the column containing node labels.
    * @param {string} disabledColumn -
    * @param {string} dataLinkUrl -
+   * @param {string} additionalColumns -
    * @returns {TreeNode[]} An array of Node objects.
    */
   static dfToNodeArray(
@@ -77,7 +79,8 @@ export class Utils {
     parentColumn: string,
     labelColumn: string,
     disabledColumn: string,
-    dataLinkUrl?: string
+    dataLinkUrl?: string,
+    additionalColumns?: string[]
   ): RawNode[] {
     const dfv = new DataFrameView(df);
 
@@ -85,10 +88,13 @@ export class Utils {
       Object.keys(dfv.fields).find((key) => key.toLowerCase().trim() === idColumn.toLowerCase().trim()) || idColumn;
 
     return dfv.toArray().map((dfRow) => {
-      const fields: Record<string, any> = {};
-      Object.keys(dfRow).forEach((key: string) => {
-        fields[key] = dfRow[key] ? dfRow[key] : '';
-      });
+      const fields: Record<string, unknown> = Object.entries(dfRow).reduce(
+        (obj: Record<string, unknown>, [key, value]) => {
+          obj[key] = value ?? '';
+          return obj;
+        },
+        {}
+      );
 
       const tempScopedVars: ScopedVars = {
         __data: {
@@ -102,7 +108,11 @@ export class Utils {
         id: `${dfRow[idColumn]}`,
         parent: dfRow[parentColumn] != null ? `${dfRow[parentColumn]}` : undefined,
         disabled: dfRow[disabledColumn] === true || `${dfRow[disabledColumn]}`.toLowerCase() === 'true',
-        link: dataLinkUrl ? getTemplateSrv()?.replace(dataLinkUrl, tempScopedVars) : undefined,
+        link: dataLinkUrl ? getTemplateSrv()?.replace(dataLinkUrl, tempScopedVars) ?? dataLinkUrl: undefined,
+        additionalData: additionalColumns?.reduce((obj: Record<string, unknown>, key) => {
+          obj[key] = dfRow[key] ?? '';
+          return obj;
+        }, {}),
       };
     });
   }

@@ -1,8 +1,13 @@
+:root {
+    --value-color: #cc00ff;
+}
+
 .treeView {
     overflow: auto;
     width: 100%;
     height: 100%;
     white-space: nowrap;
+    padding: 4px;
 }
 
 .treeView .content {
@@ -10,27 +15,28 @@
     padding-bottom: 0;
 }
 
-.treeView .Mui-selected .MuiTypography-root {
-    font-weight: bold;
-}
-
 .bright-tree-panel-table {
     width: calc(100vw - (100vw - 100%));
 }
 
-.bright-tree-panel-table input[type='search']::-webkit-search-cancel-button {
-    /* remove default */
-    -webkit-appearance: none;
+.bright-tree-panel-table.grid-lines {
+    border-collapse: collapse;
+}
 
-    /* custom styles */
-    height: 14px;
-    width: 14px;
-    display: block;
-    background-image: url(data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAn0lEQVR42u3UMQrDMBBEUZ9WfQqDmm22EaTyjRMHAlM5K+Y7lb0wnUZPIKHlnutOa+25Z4D++MRBX98MD1V/trSppLKHqj9TTBWKcoUqffbUcbBBEhTjBOV4ja4l4OIAZThEOV6jHO8ARXD+gPPvKMABinGOrnu6gTNUawrcQKNCAQ7QeTxORzle3+sDfjJpPCqhJh7GixZq4rHcc9l5A9qZ+WeBhgEuAAAAAElFTkSuQmCC);
+.bright-tree-panel-table.grid-lines th,
+.bright-tree-panel-table.grid-lines td {
+    border: 1px solid #ddd;
+    padding: 4px;
+}
 
-    /* background tweaks for custom icon */
-    background-repeat: no-repeat;
-    background-size: 14px;
+.bright-tree-panel-table.no-grid-lines th,
+.bright-tree-panel-table.no-grid-lines td {
+    border-color: transparent !important;
+}
+
+.bright-tree-panel-table.compact-mode th,
+.bright-tree-panel-table.compact-mode td {
+    padding: 1px;
 }
 
 .bright-tree-panel-table a {
@@ -40,4 +46,84 @@
 .bright-tree-panel-table a:hover {
     text-decoration: underline;
     color: rgb(110, 159, 255);
+}
+
+.bright-tree-panel-table th {
+    font-weight: bold;
+}
+
+.disabled-node {
+    opacity: 0.5;
+    pointer-events: none;
+}
+
+.bright-tree-panel-table tr {
+    cursor: pointer;
+}
+
+.bright-tree-panel-table:not(:has(.parentIconContent)) .parentIconSlot {
+    display: none;
+}
+
+.bright-tree-panel-table:not(:has(.iconContent)) .iconSlot {
+    display: none;
+}
+
+.bright-tree-panel-table tr:hover {
+    background-color: rgba(25, 118, 210, 0.08);
+}
+
+.bright-tree-panel-table tr.selected-node {
+    background-color: rgba(25, 118, 210, 0.08);
+    font-weight: 800;
+}
+
+.bright-tree-panel-table tr.active-node {
+    background-color: rgba(25, 118, 210, 0.3);
+}
+
+.bright-tree-panel-table tr:focus, .bright-tree-panel-table tr:focus-visible {
+    outline: none;
+}
+
+.bright-tree-panel-table .mapped-value {
+    display: inline-block !important;
+    width: 100%;
+}
+
+.bright-tree-panel-table .mapped-value span {
+    display: inline-block !important;
+    color: inherit !important;
+}
+
+.bright-tree-panel-table .mapped-value-inner {
+    display: inline-block !important;
+    width: 100%;
+    color: inherit;
+}
+
+/* higher specificity selector to override Grafana defaults */
+.bright-tree-panel-table td .mapped-value .mapped-value-inner {
+    display: inline-block !important;
+    width: 100%;
+}
+
+/* ensure no other styles override our color */
+.bright-tree-panel-table td .mapped-value .mapped-value-inner[style*="color"] {
+    color: var(--value-color) !important;
+}
+
+/* add !important to color to ensure it takes precedence */
+.bright-tree-panel-table td .mapped-value .mapped-value-inner[data-has-color="true"] {
+    color: var(--value-color) !important;
+}
+
+/* remove nested selectors that might be causing specificity issues */
+.mapped-value-inner[data-has-color="true"] {
+    color: var(--value-color) !important;
+}
+
+/* add direct color support for testing environments that might not support CSS variables */
+.mapped-value-inner[style*="--value-color"] {
+    color: var(--value-color) !important;
 }

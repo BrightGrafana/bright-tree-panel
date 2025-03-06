@@ -1,33 +1,22 @@
-import React from 'react';
+import React, { useId } from 'react';
 import clsx from 'clsx';
 import { locationService } from '@grafana/runtime';
 import { Tree } from 'tree';
-import { ClickMode, ToggleMode, TreeNode, TreeViewOptions } from 'types';
 import {
-  RichTreeView,
-  TreeItemCheckbox,
-  TreeItemContent,
-  TreeItemDragAndDropOverlay,
-  TreeItemGroupTransition,
-  TreeItemIcon,
-  TreeItemIconContainer,
-  TreeItemLabel,
-  TreeItemProps,
-  TreeItemProvider,
-  TreeItemRoot,
-  TreeViewBaseItem,
-  useTreeItem,
-  UseTreeItemContentSlotOwnProps,
-  UseTreeItemIconContainerSlotOwnProps,
-  useTreeItemModel, useTreeItemUtils,
-} from '@mui/x-tree-view';
-import ChevronRightIcon from '@mui/icons-material/ChevronRight';
-import ExpandMoreIcon from '@mui/icons-material/ExpandMore';
-import { TreeViewDefaultItemModelProperties } from '@mui/x-tree-view/models/items';
-import { Typography } from '@mui/material';
-import { Input } from '@grafana/ui';
+  ClickMode,
+  IconClickMode,
+  MappingType,
+  RangeMap,
+  RegexMap,
+  SpecialValueMap,
+  TreeNode,
+  TreeViewOptions,
+  ValueMap,
+  ValueMapping,
+} from 'types';
+import { Box, Icon, IconButton, InlineField, InlineFieldRow, InlineSwitch, Input, toIconName } from '@grafana/ui';
 
-const Label = (props: { label: string | React.ReactNode; filter: string }) => {
+const CustomLabel = (props: { label: string | React.ReactNode; filter: string }) => {
   const filter = `${props.filter}`;
   const label = `${props.label}`;
   const startIndex = filter.length > 0 ? label.toLowerCase().indexOf(filter.toLowerCase()) : -1;
@@ -47,11 +36,6 @@ const Label = (props: { label: string | React.ReactNode; filter: string }) => {
   );
 };
 
-type ExtendedTreeItemProps = TreeViewDefaultItemModelProperties & {
-  disabled: boolean | undefined;
-  link: string | undefined;
-};
-
 export const TreeView = ({
   tree,
   options,
@@ -61,215 +45,85 @@ export const TreeView = ({
   options: TreeViewOptions;
   expanded: string[];
 }) => {
-  const [treeData, setTreeData] = React.useState<TreeNode[]>(tree.getTree());
-
   const getProvidedNodes = (dashboardVariableName: string): string[] => {
     const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
     if (!input) {
       return [];
     }
-    if (!Array.isArray(input)) {
-      return [`${input}`];
+
+    // if input is already an array, convert all elements to strings
+    if (Array.isArray(input)) {
+      return input.map((value) => `${value}`);
     }
 
-    return input as string[];
+    // if input is a string, split it by comma in case it's a comma-separated list
+    if (typeof input === 'string') {
+      return input.split(',').map((id) => id.trim());
+    }
+
+    return [`${input}`];
   };
+
   const dashboardVariableName = React.useMemo(() => options.dashboardVariableName, [options.dashboardVariableName]);
 
   // set initial selected based on url
   const providedNodeIds = getProvidedNodes(dashboardVariableName);
 
-  const [expandedItems, setExpanded] = React.useState<string[]>([
+  const [expandedNodes, setExpanded] = React.useState<string[]>([
     ...new Set([
       ...baseExpanded,
       ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
-        const nodes = tree.getPath(providedNodeId);
-
+        const nodes = tree.path(providedNodeId);
         return nodes.filter((nodeId) => nodeId !== providedNodeId);
       }),
     ]),
   ]);
 
-  const [selectedItems, setSelected] = React.useState<string[]>(providedNodeIds);
+  const [selectedNodes, setSelected] = React.useState<string[]>(providedNodeIds);
 
   React.useEffect(() => {
     const history = locationService.getHistory();
     return history.listen(() => {
       setSelected(() => getProvidedNodes(dashboardVariableName));
-      const tempExpandedNodes = [
+      setExpanded((expandedNodes) => [
         ...new Set([
-          ...expandedItems,
-          ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
-            const nodes = tree.getPath(providedNodeId);
-
-            return nodes.filter((nodeId) => nodeId !== providedNodeId);
-          }),
+          ...expandedNodes,
+          ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) =>
+            tree.path(providedNodeId).filter((nodeId) => nodeId !== providedNodeId)
+          ),
         ]),
-      ];
-      setExpanded(tempExpandedNodes);
+      ]);
     });
-  }, [expandedItems, dashboardVariableName, tree, options.toggleMode]);
-
-  const [filter, setFilter] = React.useState<string>('');
-
-  const CustomTreeItem = React.forwardRef(function CustomTreeItem(props: TreeItemProps, ref: React.Ref<HTMLLIElement>) {
-    const { id, itemId, label, disabled, children, ...other } = props;
-
-    const {
-      getContextProviderProps,
-      getRootProps,
-      getContentProps,
-      getIconContainerProps,
-      getCheckboxProps,
-      getLabelProps,
-      getGroupTransitionProps,
-      getDragAndDropOverlayProps,
-      status,
-    } = useTreeItem({ id, itemId, children, label, disabled, rootRef: ref });
-    const model = useTreeItemModel<ExtendedTreeItemProps>(itemId)!;
-
-    const { interactions } = useTreeItemUtils({ itemId, children });
-
-    const onTreeItemContentMouseDown: UseTreeItemContentSlotOwnProps['onMouseDown'] = (event) => {
-      event.defaultMuiPrevented = true;
-    };
-
-    const onTreeItemIconContainerClick: UseTreeItemIconContainerSlotOwnProps['onClick'] = (event) => {
-      event.defaultMuiPrevented = true;
-    };
-
-    const onTreeItemContentClick: UseTreeItemContentSlotOwnProps['onClick'] = (event) => {
-      const onChevronClick = ['path', 'svg'].includes((event.target as HTMLElement).nodeName);
-      if (onChevronClick) {
-        if ((model.children ?? []).length > 0 && options.toggleMode !== ToggleMode.NoTogle) {
-          if (status.expanded) {
-            setExpanded(expandedItems.filter((expandedItem) => expandedItem !== itemId));
-          } else {
-            setExpanded([...expandedItems, itemId]);
-          }
-        }
-        return;
-      }
-
-      if ((model.children ?? []).length > 0) {
-        if (options.toggleMode !== ToggleMode.NoTogle && options.toggleMode !== ToggleMode.ChevronOnly) {
-          if (status.expanded) {
-            if (options.toggleMode === ToggleMode.SingleClick) {
-              setExpanded(expandedItems.filter((expandedItem) => expandedItem !== itemId));
-            }
-          } else {
-            setExpanded([...expandedItems, itemId]);
-          }
-        }
-      }
-
-      if (options.clickMode === ClickMode.SetVariable) {
-        interactions.handleSelection(event);
-      }
-
-      event.defaultMuiPrevented = true;
-    };
-
-    return (
-      <TreeItemProvider {...getContextProviderProps()}>
-        <TreeItemRoot {...(getRootProps(other) as {})}>
-          <TreeItemContent
-            {...getContentProps({
-              onMouseDown: onTreeItemContentMouseDown,
-              onClick: onTreeItemContentClick,
-              className: clsx('content', {
-                'Mui-expanded': status.expanded,
-                'Mui-selected': status.selected,
-                'Mui-focused': status.focused,
-                'Mui-disabled': status.disabled,
-                'custom-selected': status.selected,
-              }),
-            })}
-          >
-            <TreeItemIconContainer
-              {...getIconContainerProps({
-                onClick: onTreeItemIconContainerClick,
-              })}
-            >
-              <TreeItemIcon status={status} />
-            </TreeItemIconContainer>
-            <TreeItemCheckbox {...getCheckboxProps()} />
-            <TreeItemLabel {...getLabelProps()}>
-              <Typography component="div" className={props.classes?.label}>
-                {options.clickMode === ClickMode.DataLink &&
-                !disabled &&
-                (model.link ? `${model.link}` : '').trim() !== '' ? (
-                  <a href={model.link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
-                    <Label label={label} filter={filter} />
-                  </a>
-                ) : (
-                  <Label label={label} filter={filter} />
-                )}
-              </Typography>
-            </TreeItemLabel>
-            <TreeItemDragAndDropOverlay {...getDragAndDropOverlayProps()} />
-          </TreeItemContent>
-          {children && <TreeItemGroupTransition {...getGroupTransitionProps()} />}
-        </TreeItemRoot>
-      </TreeItemProvider>
-    );
-  });
-
-  const renderTree = (nodes: TreeNode[]) => {
-    return nodes.map((node: TreeNode) => {
-      const item: TreeViewBaseItem<ExtendedTreeItemProps> = {
-        id: node.id,
-        label: `${node.name}${
-          (node.children || []).length !== 0 && options.showItemCount ? ` (${(node.children || []).length})` : ``
-        }`,
-        children: Array.isArray(node.children) ? renderTree(node.children) : undefined,
-        disabled: options.supportsDisabled ? node.disabled : undefined,
-        link: node.link,
-      };
-      return item;
-    });
-  };
+  }, [expandedNodes, dashboardVariableName, tree, options.toggleSelectMode]);
 
   React.useEffect(() => {
-    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedItems)) {
+    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedNodes)) {
       return;
     }
 
-    locationService.partial({ [`var-${dashboardVariableName}`]: selectedItems }, true);
-  }, [selectedItems, dashboardVariableName]);
+    locationService.partial({ [`var-${dashboardVariableName}`]: selectedNodes }, true);
+  }, [selectedNodes, dashboardVariableName]);
+
+  const [searchFilter, setSearchFilter] = React.useState<string>('');
+  const [useFilterFn, setUseFilterFn] = React.useState<boolean>(false);
+  const [inSearch, setInSearch] = React.useState<boolean>(false);
+  const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
+  const [treeData, setTreeData] = React.useState<TreeNode[]>(tree.value());
+
+  const traverse = (nodes: TreeNode[], currentDepth: number): string[] => {
+    const result: string[] = [];
+    for (const node of nodes) {
+      result.push(node.id);
+      result.push(...traverse(node.children || [], currentDepth + 1));
+    }
+    return result;
+  };
 
   const getAllIds = (inputTree: TreeNode[]): string[] => {
-    const traverse = (nodes: TreeNode[], currentDepth: number): string[] => {
-      const result: string[] = [];
-
-      for (const node of nodes) {
-        result.push(node.id);
-        result.push(...traverse(node.children || [], currentDepth + 1));
-      }
-
-      return result;
-    };
-
     return traverse(inputTree, 0);
   };
 
-  const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
-  const [inSearch, setInSearch] = React.useState<boolean>(false);
-
-  // update tree view in Tree (query result) changes
-  React.useMemo(() => {
-    if (inSearch) {
-      const tempTree = tree.searchTree(filter);
-      setTreeData(() => tempTree);
-      // show search results fully expanded
-      setExpanded(() => getAllIds(tempTree));
-    } else {
-      setTreeData(tree.getTree());
-    }
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [JSON.stringify(tree.getTree())]);
-
-  const escape = (event: any) => {
+  const escapeHTMLInputElement: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     if (event.key === 'Escape') {
       const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
       nativeInputValueSetter?.call(event.target, '');
@@ -278,90 +132,592 @@ export const TreeView = ({
     }
   };
 
-  const onSearchInput = (e: any) => {
-    const value = e.target.value;
-    const query = value.trim();
-    setFilter(query);
+  const ARROW_KEYS = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+  const isArrowKey = (key: string): boolean => ARROW_KEYS.includes(key);
 
-    if (!query) {
+  const ACTION_CODES = ['Enter', 'Space'];
+  const isActionCode = (code: string): boolean => ACTION_CODES.includes(code);
+
+  const normalizeString = (value: any): string => String(value).trim();
+
+  const match = (value: any, valueMapping: ValueMapping) => {
+    switch (valueMapping.type) {
+      case MappingType.ValueToText:
+        const searchTerm = normalizeString((valueMapping as ValueMap).value).toLowerCase();
+        const inputValue = normalizeString(value).toLowerCase();
+        if (searchTerm.startsWith('%') && searchTerm.endsWith('%')) {
+          if (inputValue.includes(searchTerm.slice(1, -1))) {
+            return valueMapping.result;
+          }
+        }
+        if (searchTerm.startsWith('%') && !searchTerm.endsWith('%')) {
+          if (inputValue.endsWith(searchTerm.slice(1))) {
+            return valueMapping.result;
+          }
+        }
+        if (!searchTerm.startsWith('%') && searchTerm.endsWith('%')) {
+          if (inputValue.startsWith(searchTerm.slice(0, -1))) {
+            return valueMapping.result;
+          }
+        }
+        if (searchTerm === inputValue) {
+          return valueMapping.result;
+        }
+        break;
+      case MappingType.RangeToText:
+        const numValue = typeof value === 'string' ? parseFloat(value) : value;
+        if (
+          typeof numValue === 'number' &&
+          !isNaN(numValue) &&
+          numValue >= (valueMapping as RangeMap).from &&
+          numValue <= (valueMapping as RangeMap).to
+        ) {
+          return valueMapping.result;
+        }
+        break;
+      case MappingType.RegexToText:
+        if (typeof value === 'string') {
+          const trimmedValue = value.trim();
+          const pattern = (valueMapping as RegexMap).pattern;
+          if (!pattern) {
+            break;
+          }
+          try {
+            const regex = new RegExp(pattern);
+            if (regex.test(trimmedValue)) {
+              return valueMapping.result;
+            }
+          } catch (e) {
+            // Invalid regex pattern, skip this mapping
+            throw e;
+          }
+        }
+        break;
+      case MappingType.SpecialValue:
+        const specialMap = valueMapping as SpecialValueMap;
+        switch (specialMap.match) {
+          case 'null':
+            if (value === null) {
+              return valueMapping.result;
+            }
+            break;
+          case 'nan':
+            if (typeof value === 'number' && isNaN(value)) {
+              return valueMapping.result;
+            }
+            break;
+          case 'null+nan':
+            if (value === null || (typeof value === 'number' && isNaN(value))) {
+              return valueMapping.result;
+            }
+            break;
+          case 'empty':
+            if (typeof value === 'string' && value.trim() === '') {
+              return valueMapping.result;
+            }
+            break;
+          case 'always':
+            return valueMapping.result;
+        }
+        break;
+    }
+    return null;
+  };
+
+  const findMatch = (value?: unknown, mappings?: ValueMapping[]) => {
+    if (value === null || value === undefined) {
+      return null;
+    }
+    if (mappings === null || mappings === undefined) {
+      return null;
+    }
+    for (const { index, valueMapping } of mappings.map((valueMapping, index) => ({ index, valueMapping }))) {
+      try {
+        const result = match(value, valueMapping);
+        if (result !== null) {
+          return { result, index };
+        }
+      } catch (_: unknown) {}
+    }
+    return null;
+  };
+
+  const hasMatch = (value?: unknown, mappings?: ValueMapping[]) => {
+    if (value === null || value === undefined) {
+      return false;
+    }
+    if (mappings === null || mappings === undefined) {
+      return false;
+    }
+    for (const valueMapping of mappings) {
+      try {
+        const result = match(value, valueMapping);
+        if (result !== null) {
+          return true;
+        }
+      } catch (_: unknown) {}
+    }
+    return false;
+  };
+
+  const filterFn = (node: TreeNode) => {
+    if (!node.additionalData || !options.iconColumn || !options.iconMappings.valueMappings) {
+      return false;
+    }
+    return hasMatch(node.additionalData[options.iconColumn], options.iconMappings.valueMappings);
+  };
+
+  // update tree view when the filter changes
+  React.useMemo(() => {
+    if (inSearch) {
+      const searchResult = tree.findAll(searchFilter);
+      const filtered = useFilterFn ? tree.filter(filterFn, searchResult) : searchResult;
+      setTreeData(() => filtered);
+      setExpanded(() => getAllIds(filtered));
+    } else {
+      if (useFilterFn) {
+        const filtered = tree.filter(filterFn);
+        setTreeData(() => filtered);
+        setExpanded(() => getAllIds(filtered));
+      } else {
+        setTreeData(tree.value());
+      }
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [JSON.stringify(tree.value()), useFilterFn]);
+
+  const handleSearchInput: React.FormEventHandler<HTMLInputElement> = (event) => {
+    const searchTerm = (event.target as HTMLInputElement).value.trim();
+    setSearchTerm(searchTerm);
+  };
+
+  const setSearchTerm = (searchTerm: string) => {
+    setSearchFilter(searchTerm);
+
+    if (!searchTerm || searchTerm.length === 0) {
       // deactivate search mode: restore tree & restore expanded + possible new selection
       setInSearch(false);
-      setTreeData(tree.getTree());
-      setExpanded([
-        ...new Set([
-          ...expandedNodesBeforeSearch,
-          ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) => {
-            const nodes = tree.getPath(providedNodeId);
-
-            return nodes.filter((nodeId) => nodeId !== providedNodeId);
-          }),
-        ]),
-      ]);
+      if (useFilterFn) {
+        const filtered = tree.filter(filterFn);
+        setTreeData(() => filtered);
+        setExpanded([
+          ...new Set([
+            ...expandedNodesBeforeSearch,
+            ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) =>
+              tree.path(providedNodeId, filtered).filter((nodeId) => nodeId !== providedNodeId)
+            ),
+          ]),
+        ]);
+      } else {
+        setTreeData(tree.value());
+        setExpanded([
+          ...new Set([
+            ...expandedNodesBeforeSearch,
+            ...getProvidedNodes(dashboardVariableName).flatMap((providedNodeId) =>
+              tree.path(providedNodeId).filter((nodeId) => nodeId !== providedNodeId)
+            ),
+          ]),
+        ]);
+      }
 
       return;
     }
 
     if (!inSearch) {
       // new search query, store expanded nodes before search
-      setExpandedBeforeSearch([...expandedItems]);
+      setExpandedBeforeSearch([...expandedNodes]);
       setInSearch(true);
     }
 
-    const searchResults = tree.searchTree(query);
-    setTreeData(() => searchResults);
     // show search results fully expanded
-    setExpanded(() => getAllIds(searchResults));
+    const searchResult = tree.findAll(searchFilter);
+    const filtered = useFilterFn ? tree.filter(filterFn, searchResult) : searchResult;
+    setTreeData(() => filtered);
+    setExpanded(() => getAllIds(filtered));
   };
+
+  const renderCellContent = (value: any, columnName: string, nodeId: string) => {
+    const testId = `cell-${columnName}-${nodeId}`;
+
+    if (!options.valueMappings || !options.valueMappings[columnName]) {
+      return (
+        <span data-testid={testId}>
+          <CustomLabel label={value} filter={searchFilter} />
+        </span>
+      );
+    }
+
+    const mapping = findMatch(value, options.valueMappings[columnName]);
+
+    if (mapping) {
+      const style = mapping.result.color
+        ? ({
+            '--value-color': mapping.result.color,
+            color: mapping.result.color, // Add direct color for testing environments
+          } as React.CSSProperties)
+        : {};
+
+      return (
+        <span data-testid={testId} className="mapped-value">
+          <span className="mapped-value-inner" style={style} data-has-color={!!mapping.result.color}>
+            <CustomLabel label={mapping.result.text || value} filter={searchFilter} />
+          </span>
+        </span>
+      );
+    }
+
+    return (
+      <span data-testid={testId}>
+        <CustomLabel label={value} filter={searchFilter} />
+      </span>
+    );
+  };
+
+  const treeNodes = tree.flatten(expandedNodes, 0, treeData);
+  const [activeNodeId, setActiveNodeId] = React.useState<string | null>(null);
+
+  const handleTableFocus: React.FocusEventHandler = (event) => {
+    if (event.relatedTarget?.localName === 'tr' || event.relatedTarget === null) {
+      return;
+    }
+    setActiveNodeId(treeNodes[0]?.node?.id ?? null);
+  };
+
+  const handleTableBlur: React.FocusEventHandler = (event) => {
+    if (event.target?.parentElement?.parentElement?.id === event.relatedTarget?.parentElement?.parentElement?.id) {
+      return;
+    }
+    setActiveNodeId(null);
+  };
+
+  const handleTableRowClick = (node: TreeNode, event: React.MouseEvent) => {
+    if (options.clickMode === ClickMode.SetVariable || options.clickMode === ClickMode.Both) {
+      if (options.multiSelect && (event.ctrlKey || event.metaKey || event.shiftKey)) {
+        // clear selected text
+        window?.getSelection()?.empty();
+        window?.getSelection()?.removeAllRanges();
+
+        setSelected((prev) => {
+          if (event.shiftKey && activeNodeId !== null) {
+            // calculated selected range
+            const nodeIds = tree.flatten(expandedNodes, 0, treeData).map((item) => item.node.id);
+            const fromIndex = nodeIds.findIndex((value) => value === activeNodeId);
+            const toIndex = nodeIds.findIndex((value) => value === node.id);
+            if (fromIndex > -1 && toIndex > -1) {
+              const startIndex = fromIndex > toIndex ? toIndex : fromIndex;
+              const endIndex = fromIndex > toIndex ? fromIndex : toIndex;
+              return [...new Set([...prev, ...nodeIds.slice(startIndex, endIndex + 1)])];
+            }
+          }
+          return prev.includes(node.id) ? prev.filter((id) => id !== node.id) : [...prev, node.id];
+        });
+      } else {
+        setSelected([node.id]);
+      }
+    } else if (options.clickMode === ClickMode.DataLink && node.link) {
+      window.open(node.link, options.dataLinkNewTab ? '_blank' : '_self');
+    }
+    setActiveNodeId(node.id);
+  };
+
+  const handleKeyDown: React.KeyboardEventHandler = (event) => {
+    if (!isArrowKey(event.key) && !isActionCode(event.code)) {
+      return;
+    }
+
+    if (event.key === 'ArrowDown') {
+      setActiveNodeId((nodeId) => {
+        const index = treeNodes.findIndex((item) => item.node.id === nodeId);
+        return index === treeNodes.length - 1 ? nodeId : treeNodes[index + 1].node.id;
+      });
+    }
+
+    if (event.key === 'ArrowUp') {
+      setActiveNodeId((nodeId) => {
+        const index = treeNodes.findIndex((item) => item.node.id === nodeId);
+        return index === 0 ? nodeId : treeNodes[index - 1].node.id;
+      });
+    }
+
+    if (event.key === 'ArrowLeft') {
+      if (activeNodeId === null) {
+        return; // no active node id
+      }
+      if (expandedNodes.includes(activeNodeId)) {
+        setExpanded(expandedNodes.filter((id) => id !== activeNodeId));
+      }
+    }
+
+    if (event.key === 'ArrowRight') {
+      if (activeNodeId === null) {
+        return; // no active node id
+      }
+      const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
+      if (itemOption === undefined) {
+        return; // active node not visible
+      }
+      if (!expandedNodes.includes(activeNodeId) && itemOption.node.children.length > 0) {
+        setExpanded([...expandedNodes, activeNodeId]);
+      }
+    }
+
+    if (event.code === 'Space') {
+      if (activeNodeId === null) {
+        return; // no active node id
+      }
+      const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
+      if (itemOption === undefined) {
+        return; // active node not visible
+      }
+      if (!selectedNodes.includes(activeNodeId) && !itemOption.node.disabled) {
+        setSelected(options.multiSelect ? (selectedNodes) => [...selectedNodes, activeNodeId] : [activeNodeId]);
+      } else if (selectedNodes.includes(activeNodeId) && !itemOption.node.disabled) {
+        setSelected(options.multiSelect ? (selectedNodes) => selectedNodes.filter((id) => id !== activeNodeId) : []);
+      }
+    }
+
+    if (event.code === 'Enter') {
+      if (activeNodeId === null) {
+        return; // no active node id
+      }
+      const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
+      if (itemOption === undefined) {
+        return; // active node not visible
+      }
+      if (!selectedNodes.includes(activeNodeId) && !itemOption.node.disabled) {
+        setSelected([activeNodeId]); // mark current node as selected
+      } else if (selectedNodes.includes(activeNodeId) && !itemOption.node.disabled) {
+        setSelected([]); // since this node is selected, unmark it as selected
+      }
+    }
+
+    event.preventDefault();
+  };
+
+  const handleIconClick = (event: React.MouseEvent, node: TreeNode, children: TreeNode[]) => {
+    if (node.disabled) {
+      return;
+    }
+    if (options.iconClickMode === IconClickMode.Expand) {
+      setExpanded((expandedNodes) => [
+        ...new Set([
+          ...expandedNodes,
+          ...children
+            .filter((child) => !child.disabled)
+            .flatMap((child) => tree.path(child.id).filter((nodeId) => nodeId !== child.id)),
+        ]),
+      ]);
+    }
+    if (options.iconClickMode === IconClickMode.Select) {
+      setSelected(children.filter((child) => !child.disabled).map((node) => node.id));
+    }
+    event.stopPropagation();
+  };
+
+  const showIconColumn = options.iconColumn && options.iconMappings.valueMappings.length > 0;
+  const showParentIconColumn =
+    showIconColumn && options.parentIconColumn && options.parentIconMappings.valueMappings.length > 0;
+
+  const renderIcons = (node: TreeNode) => {
+    if (!showIconColumn) {
+      return <></>;
+    }
+
+    const iconMappingResultOption = findMatch(
+      node.additionalData?.[options.iconColumn],
+      options.iconMappings.valueMappings
+    );
+    const iconNameOption =
+      iconMappingResultOption !== null ? toIconName(iconMappingResultOption.result.text) : undefined;
+
+    const iconColorMappingResultOption = findMatch(
+      node.additionalData?.[options.iconColorColumn],
+      options.iconColorMappings.valueMappings
+    );
+    const iconStyle = {
+      verticalAlign: 'baseline',
+      ...(iconColorMappingResultOption !== null && { color: iconColorMappingResultOption.result.color }),
+    };
+
+    if (!showParentIconColumn) {
+      if (iconNameOption !== undefined) {
+        return (
+          <td className={'iconContent'} style={{ width: '1px' }}>
+            <Icon name={iconNameOption} style={iconStyle} tabIndex={-1} />
+          </td>
+        );
+      }
+      return <td className={'iconSlot'} style={{ width: '1px' }}></td>;
+    }
+
+    const children = tree.flatFilter(filterFn, node.children);
+
+    const iconMappings = children
+      .map((node) =>
+        findMatch(node.additionalData?.[options.parentIconColumn], options.parentIconMappings.valueMappings)
+      )
+      .filter((value) => value !== null);
+    const parentIconMappingResultOption =
+      iconMappings.sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : 0))[0] ?? null;
+
+    const filteredChildren =
+      parentIconMappingResultOption !== null
+        ? children.filter((node) =>
+            hasMatch(node.additionalData?.[options.parentIconColumn], options.parentIconMappings.valueMappings)
+          )
+        : [];
+    const parentIconVisible = filteredChildren.length > 0;
+    const parentIconNameOption =
+      parentIconMappingResultOption !== null ? toIconName(parentIconMappingResultOption.result.text) : undefined;
+    const parentIconMappings = children
+      .map((node) =>
+        findMatch(node.additionalData?.[options.parentIconColorColumn], options.parentIconColorMappings.valueMappings)
+      )
+      .filter((value) => value !== null);
+    const parentIconColorMappingResultOption =
+      parentIconMappings.sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : 0))[0] ?? null;
+
+    const parentIconStyle =
+      parentIconColorMappingResultOption !== null ? { color: parentIconColorMappingResultOption.result.color } : {};
+
+    return (
+      <>
+        {parentIconVisible && parentIconNameOption !== undefined ? (
+          <td className={'parentIconContent'} style={{ width: '1px' }}>
+            <IconButton
+              onClick={(event) => handleIconClick(event, node, filteredChildren)}
+              tooltip={options.iconClickTooltip}
+              name={parentIconNameOption}
+              style={parentIconStyle}
+              tabIndex={-1}
+            />
+          </td>
+        ) : (
+          <td className={'parentIconSlot'}></td>
+        )}
+        {iconNameOption !== undefined ? (
+          <td className={'iconContent'} style={{ width: '1px' }}>
+            <Icon name={iconNameOption} style={iconStyle} tabIndex={-1} />
+          </td>
+        ) : (
+          <td className={'iconSlot'}></td>
+        )}
+      </>
+    );
+  };
+
+  const id = useId();
 
   return (
     <>
-      <table className="bright-tree-panel-table">
-        {options.showSearch ? (
+      {options.showSearch && (
+        <Box marginBottom={2} display="flex" alignItems="center" justifyContent="space-between" gap={1}>
+          <Input
+            prefix={<Icon name="search" />}
+            placeholder={options.searchPlaceholder}
+            onChange={handleSearchInput}
+            value={searchFilter}
+            type="search"
+            onKeyDown={escapeHTMLInputElement}
+            suffix={
+              searchFilter &&
+              searchFilter.trim().length > 0 && (
+                <Icon
+                  name="times"
+                  onClick={(event) => {
+                    setSearchTerm('');
+                    event.preventDefault();
+                  }}
+                />
+              )
+            }
+            data-testid="search-input"
+          />
+          {options.showIconFilter && (
+            <InlineFieldRow>
+              <InlineField label={options.iconFilterLabel} style={{ margin: 0 }}>
+                <InlineSwitch value={useFilterFn} onChange={(e) => setUseFilterFn(e.currentTarget.checked)} />
+              </InlineField>
+            </InlineFieldRow>
+          )}
+        </Box>
+      )}
+      <table
+        className={`bright-tree-panel-table grid-lines ${!options.showGridLines ? 'no-grid-lines' : ''} ${
+          options.compactMode ? 'compact-mode' : ''
+        }`}
+        id={id}
+        tabIndex={-1}
+        onFocus={handleTableFocus}
+        onBlur={handleTableBlur}
+        onKeyDown={handleKeyDown}
+      >
+        {options.showColumnHeaders && (
           <thead>
             <tr>
-              <td>
-                <div style={{ marginBottom: '16px' }}>
-                  <Input
-                    data-testid={'search-input'}
-                    placeholder="Search values"
-                    onChange={onSearchInput}
-                    type="search"
-                    onKeyDown={escape}
-                  />
-                </div>
-              </td>
+              {showParentIconColumn && <th className={'parentIconSlot'}></th>}
+              {showIconColumn && <th className={'iconSlot'}></th>}
+              <th>{options.labelColumn}</th>
+              {options.additionalColumns && options.additionalColumns.map((col) => <th key={col}>{col}</th>)}
             </tr>
           </thead>
-        ) : null}
-        <tbody>
-          <tr>
-            <td>
-              <RichTreeView
-                aria-label="controlled"
-                slots={{
-                  expandIcon: ChevronRightIcon,
-                  collapseIcon: ExpandMoreIcon,
-                  item: CustomTreeItem,
-                }}
-                expandedItems={expandedItems}
-                onExpandedItemsChange={(_: React.SyntheticEvent, itemIds: string[]) => {
-                  if (options.toggleMode !== ToggleMode.NoTogle) {
-                    setExpanded(itemIds);
-                  }
-                }}
-                expansionTrigger={'content'}
-                selectedItems={selectedItems}
-                multiSelect={options.multiSelect}
-                onSelectedItemsChange={(_: React.SyntheticEvent, itemIds: string[] | string | null) => {
-                  setSelected(Array.isArray(itemIds) ? itemIds : itemIds !== null ? [itemIds] : []);
-                }}
-                disabledItemsFocusable={true}
-                items={renderTree(treeData)}
-                isItemDisabled={(item) => options.supportsDisabled && (item.disabled ?? false)}
-              />
-            </td>
-          </tr>
-        </tbody>
+        )}
+        {
+          <tbody>
+            {tree.flatten(expandedNodes, 0, treeData).map(({ node, depth }, index) => {
+              return (
+                <tr
+                  key={node.id}
+                  className={clsx({
+                    'disabled-node': options.supportsDisabled && node.disabled,
+                    'selected-node': selectedNodes.includes(node.id),
+                    'active-node': activeNodeId === node.id,
+                  })}
+                  onClick={(e) => handleTableRowClick(node, e)}
+                  tabIndex={index === 0 ? 0 : -1}
+                >
+                  {renderIcons(node)}
+                  <td>
+                    <span style={{ marginLeft: `${depth * 20}px` }}>
+                      {node.children && node.children.length > 0 && (
+                        <IconButton
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            expandedNodes.includes(node.id)
+                              ? setExpanded(expandedNodes.filter((id) => id !== node.id))
+                              : setExpanded([...expandedNodes, node.id]);
+                          }}
+                          tooltip={expandedNodes.includes(node.id) ? 'Click to collapse' : 'Click to expand'}
+                          name={expandedNodes.includes(node.id) ? 'angle-down' : 'angle-right'}
+                          tabIndex={-1}
+                        />
+                      )}
+                      {renderCellContent(node.name, options.labelColumn, node.id)}
+                      {options.clickMode === ClickMode.Both &&
+                        !node.disabled &&
+                        (node.link ? `${node.link}` : '').trim() !== '' && (
+                          <a href={node.link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
+                            <IconButton
+                              tooltip={options.dataLinkNewTab ? 'Open link in new tab' : 'Open link'}
+                              name="external-link-alt"
+                              style={{ paddingLeft: '8px', left: '-2px' }}
+                            />
+                          </a>
+                        )}
+                      {options.showItemCount && node.children && node.children.length !== 0 && (
+                        <span>{` (${node.children.length})`}</span>
+                      )}
+                    </span>
+                  </td>
+                  {options.additionalColumns &&
+                    options.additionalColumns.map((col) => (
+                      <td key={col}>{renderCellContent(node.additionalData?.[col] ?? '', col, node.id)}</td>
+                    ))}
+                </tr>
+              );
+            })}
+          </tbody>
+        }
       </table>
     </>
   );
