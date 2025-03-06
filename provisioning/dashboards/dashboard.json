@@ -78,7 +78,7 @@
           }
         }
       ],
-      "type": "equansdatahub-tree-panel"
+      "type": "equansdatahub-tree-panel-dev"
     },
     {
       "datasource": {
@@ -135,7 +135,7 @@
           }
         }
       ],
-      "type": "equansdatahub-tree-panel"
+      "type": "equansdatahub-tree-panel-dev"
     }
   ],
   "refresh": "",

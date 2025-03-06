@@ -1,8 +1,8 @@
 {
   "$schema": "https://raw.githubusercontent.com/grafana/grafana/main/docs/sources/developers/plugins/plugin.schema.json",
   "type": "panel",
-  "name": "Interactive Tree Panel",
-  "id": "equansdatahub-tree-panel",
+  "name": "Interactive Tree Panel DEV",
+  "id": "equansdatahub-tree-panel-dev",
   "info": {
     "keywords": ["panel"],
     "description": "View data, from a table data source, as a interactive tree like structure",

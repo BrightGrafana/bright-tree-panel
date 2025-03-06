@@ -1,6 +1,6 @@
 import { PanelData } from '@grafana/data';
 import { Validator } from 'validator';
-import { ClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './types';
+import { ClickMode, IconClickMode, PanelOptions, RawNode, ToggleMode, TreeLevelOrderMode } from './types';
 
 describe('Validator', () => {
   describe('validateTreeInput', () => {
@@ -44,6 +44,20 @@ describe('Validator', () => {
 
       // assert
       expect(result).toThrow('Parent can not be mapped to itself. For id: 2');
+    });
+
+    it('should throw error if parent is undefined', () => {
+      // arrange
+      const input: RawNode[] = [
+        { id: '1', name: 'n1', disabled: false },
+        { id: '2', name: 'n2', parent: undefined, disabled: false },
+      ];
+
+      // act
+      const result = () => Validator.validateTreeInput(input);
+
+      // assert
+      expect(result).not.toThrow();
     });
   });
   describe('validateTreeBranches', () => {
@@ -90,6 +104,24 @@ describe('Validator', () => {
     toggleSelectMode: ToggleMode.SingleClick,
     dataLinkUrl: 'http://www.google.com',
     dataLinkNewTab: false,
+    additionalColumns:'',
+    iconClickMode: IconClickMode.DoNothing,
+    iconClickTooltip: '',
+    iconColorColumn: '',
+    iconColorMappings: {valueMappings:[]},
+    iconColumn: '',
+    iconFilterLabel: '',
+    iconMappings: {valueMappings:[]},
+    parentIconColorColumn: '',
+    parentIconColorMappings: {valueMappings:[]},
+    parentIconColumn: '',
+    parentIconMappings: {valueMappings:[]},
+    searchPlaceholder: '',
+    showColumnHeaders: false,
+    showGridLines: false,
+    showIconFilter: false,
+    valueMappings: {},
+    compactMode: false
   };
 
   describe('validateOptionsInput', () => {
