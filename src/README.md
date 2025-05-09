@@ -51,6 +51,9 @@ When configuring the panel, you have several customization options at your dispo
 
 - **Toggle mode**: How Chevron and Label clicking is handled. with `no toggle` make sure `Expanded levels` is high enough.
 - **Allow multi select using Ctrl-Click or Shift-Click**: Select different nodes by holding down the Ctrl key or visible ranges using the Shift key.
+- **Show checkbox**: Select different nodes by using a checkbox in front of the label.
+- **Enable select/deselect all**  Add an option to the list to select or deselect all nodes at once.
+- **Include disabled nodes in select/deselect all** Select or deselect disabled nodes when select/deselect all checkbox is clicked.
 - **Click mode**: How interaction with the tree is handled. `Set dashboard variable` will store the id of the clicked node(s) in a dashboard variable. `Data link` will open a URL when a node is clicked. `Both` will store the id of the clicked node(s) in a dashboard variable and shows an icon that will open a URL when clicked.
 - **Dashboard variable name**: Name of the dashboard variable in which the id of the clicked node(s) is/are stored.
 - **Data link URL**: URL to open when a node is clicked. Use the `__data` variable to access the node data. for example: `${__data.fields.link:raw}${__data.fields.label:percentencode}`.

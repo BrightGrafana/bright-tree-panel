@@ -55,6 +55,10 @@
 .disabled-node {
     opacity: 0.5;
     pointer-events: none;
+
+    & svg {
+        pointer-events: all;
+    }
 }
 
 .bright-tree-panel-table tr {
@@ -123,4 +127,10 @@
 /* add direct color support for testing environments that might not support CSS variables */
 .mapped-value-inner[style*="--value-color"] {
     color: var(--value-color) !important;
+}
+
+*[tabindex="-1"]:focus + span, *[tabindex="-1"]:focus-visible + span {
+    outline: none !important;
+    box-shadow: none !important;
+    transition: none !important;
 }

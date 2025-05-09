@@ -19,8 +19,15 @@ function toArray(value: string | undefined): string[] {
   );
 }
 
-export const TreePanel: React.FC<Props> = ({ options, data, fieldConfig, id }) => {
-  // validate options input before anything else
+interface RenderTreeViewWithDataProps {
+  options: PanelOptions;
+  data: any;
+  fieldConfig: any;
+  id: any;
+}
+
+const RenderTreeViewWithData: React.FC<RenderTreeViewWithDataProps> = ({ options, data, fieldConfig, id }) => {
+  // validate input before anything else
   Validator.validateOptionsInput(options, data);
 
   const additionalColumns: string[] = React.useMemo(
@@ -93,4 +100,12 @@ export const TreePanel: React.FC<Props> = ({ options, data, fieldConfig, id }) =
       <TreeView tree={tree} options={treeViewOptions} expanded={expandedNodeIds} />
     </div>
   );
+};
+
+export const TreePanel: React.FC<Props> = ({ options, data, fieldConfig, id, eventBus }) => {
+  if (data.series.length === 0) {
+    return;
+  }
+
+  return <RenderTreeViewWithData options={options} data={data} fieldConfig={fieldConfig} id={id} />;
 };

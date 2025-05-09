@@ -78,5 +78,21 @@ export function migrationHandler(panel: PanelModel<Partial<PanelOptions>>) {
     };
   }
 
+  if (options.multiSelect === true) {
+    if (options.showCheckbox === undefined) {
+      options.showCheckbox = true;
+    }
+    if (options.showCheckbox) {
+      if (options.enableSelectDeselectAll === undefined) {
+        options.enableSelectDeselectAll = true;
+      }
+      if (options.enableSelectDeselectAll) {
+        if (options.includeDisabled === undefined) {
+          options.includeDisabled = false;
+        }
+      }
+    }
+  }
+
   return options;
 }

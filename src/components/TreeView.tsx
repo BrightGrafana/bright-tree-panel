@@ -3,7 +3,7 @@ import clsx from 'clsx';
 import { locationService } from '@grafana/runtime';
 import { Tree } from 'tree';
 import { ClickMode, IconClickMode, TreeNode, TreeViewOptions } from 'types';
-import { Box, Icon, IconButton, InlineField, InlineFieldRow, InlineSwitch, Input, toIconName } from '@grafana/ui';
+import { Box, Checkbox, Icon, InlineField, InlineFieldRow, InlineSwitch, Input, toIconName } from '@grafana/ui';
 import { findMatch, hasMatch } from '../valueMapping';
 
 const CustomLabel = (props: { label: string | React.ReactNode; filter: string }) => {
@@ -15,9 +15,14 @@ const CustomLabel = (props: { label: string | React.ReactNode; filter: string })
     <>
       {startIndex !== -1 ? (
         <>
-          <span>{label.slice(0, startIndex)}</span>
-          <span style={{ textDecoration: 'underline' }}>{label.slice(startIndex, startIndex + filter.length)}</span>
-          <span>{label.slice(startIndex + filter.length)}</span>
+          <span dangerouslySetInnerHTML={{ __html: label.slice(0, startIndex).replace(' ', '&nbsp;') }} />
+          <span
+            style={{ textDecoration: 'underline' }}
+            dangerouslySetInnerHTML={{
+              __html: label.slice(startIndex, startIndex + filter.length).replace(' ', '&nbsp;'),
+            }}
+          />
+          <span dangerouslySetInnerHTML={{ __html: label.slice(startIndex + filter.length).replace(' ', '&nbsp;') }} />
         </>
       ) : (
         label
@@ -35,10 +40,53 @@ export const TreeView = ({
   options: TreeViewOptions;
   expanded: string[];
 }) => {
-  const getProvidedNodes = (dashboardVariableName: string): string[] => {
-    const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
-    if (!input) {
+  const getTreeNodeIds = React.useCallback((nodes: TreeNode[], currentDepth = 0): string[] => {
+    const result: string[] = [];
+    for (const node of nodes) {
+      result.push(node.id);
+      result.push(...getTreeNodeIds(node.children || [], currentDepth + 1));
+    }
+    return result;
+  }, []);
+
+  const allTreeNodeIds = React.useMemo(() => getTreeNodeIds(tree.value(), 0), [tree, getTreeNodeIds]);
+
+  const getEnabledTreeNodeIds = React.useCallback((nodes: TreeNode[], currentDepth = 0): string[] => {
+    const result: string[] = [];
+    for (const node of nodes) {
+      if (!node.disabled) {
+        result.push(node.id);
+      }
+      result.push(...getEnabledTreeNodeIds(node.children || [], currentDepth + 1));
+    }
+    return result;
+  }, []);
+
+  const enabledTreeNodeIds = React.useMemo(() => getEnabledTreeNodeIds(tree.value(), 0), [tree, getEnabledTreeNodeIds]);
+
+  const includesAllTreeNodeIds = React.useCallback(
+    (ids: string[]) => ids.length === allTreeNodeIds.length && ids.every((id) => allTreeNodeIds.includes(id)),
+    [allTreeNodeIds]
+  );
+
+  const includesAllEnabledTreeNodeIds = React.useCallback(
+    (ids: string[]) => ids.length === enabledTreeNodeIds.length && ids.every((id) => enabledTreeNodeIds.includes(id)),
+    [enabledTreeNodeIds]
+  );
+
+  /**
+   * Parse input value from various possible formats into string array
+   * @param input The input value from URL params or other sources
+   * @param allValues Optional array of all possible values for '$__all' keyword
+   */
+  const parseInputValue = React.useCallback((input: any, allValues?: string[]): string[] => {
+    if (input === null || input === undefined || input === '') {
       return [];
+    }
+
+    // check for '$__all' keyword and substitute with ids
+    if (input === '$__all' && allValues) {
+      return allValues.map((id) => `${id}`);
     }
 
     // if input is already an array, convert all elements to strings
@@ -52,7 +100,27 @@ export const TreeView = ({
     }
 
     return [`${input}`];
-  };
+  }, []);
+
+  const getProvidedNodes = React.useCallback(
+    (dashboardVariableName: string): string[] => {
+      const input = locationService.getSearchObject()[`var-${dashboardVariableName}`];
+      return parseInputValue(
+        input,
+        options.showCheckbox && options.enableSelectDeselectAll && !options.includeDisabled
+          ? enabledTreeNodeIds
+          : allTreeNodeIds
+      );
+    },
+    [
+      allTreeNodeIds,
+      enabledTreeNodeIds,
+      parseInputValue,
+      options.showCheckbox,
+      options.enableSelectDeselectAll,
+      options.includeDisabled,
+    ]
+  );
 
   const dashboardVariableName = React.useMemo(() => options.dashboardVariableName, [options.dashboardVariableName]);
 
@@ -71,6 +139,25 @@ export const TreeView = ({
 
   const [selectedNodes, setSelected] = React.useState<string[]>(providedNodeIds);
 
+  const [allNoneSelected, setAllNoneSelected] = React.useState<boolean | undefined>(undefined);
+
+  React.useEffect(() => {
+    const all =
+      options.showCheckbox && options.enableSelectDeselectAll && !options.includeDisabled
+        ? enabledTreeNodeIds.every((nodeId: string) => selectedNodes.includes(nodeId))
+        : allTreeNodeIds.every((nodeId: string) => selectedNodes.includes(nodeId));
+    const none = selectedNodes.length === 0;
+    setAllNoneSelected(none ? false : all ? all : undefined);
+  }, [
+    enabledTreeNodeIds,
+    allTreeNodeIds,
+    selectedNodes,
+    setAllNoneSelected,
+    options.showCheckbox,
+    options.enableSelectDeselectAll,
+    options.includeDisabled,
+  ]);
+
   React.useEffect(() => {
     const history = locationService.getHistory();
     return history.listen(() => {
@@ -84,34 +171,49 @@ export const TreeView = ({
         ]),
       ]);
     });
-  }, [expandedNodes, dashboardVariableName, tree, options.toggleSelectMode]);
+  }, [dashboardVariableName, tree, getProvidedNodes]);
+
+  /**
+   * Checks if two arrays of node IDs contain the same elements (order independent)
+   */
+  const areNodeSelectionsEqual = React.useCallback((nodes1: string[], nodes2: string[]): boolean => {
+    return nodes1.length === nodes2.length && nodes1.every((nodeId) => nodes2.includes(nodeId));
+  }, []);
 
   React.useEffect(() => {
-    if (JSON.stringify(getProvidedNodes(dashboardVariableName)) === JSON.stringify(selectedNodes)) {
+    const providedNodes = getProvidedNodes(dashboardVariableName);
+    if (areNodeSelectionsEqual(providedNodes, selectedNodes)) {
       return;
     }
 
-    locationService.partial({ [`var-${dashboardVariableName}`]: selectedNodes }, true);
-  }, [selectedNodes, dashboardVariableName]);
+    if (options.showCheckbox && options.enableSelectDeselectAll && !options.includeDisabled) {
+      const value = includesAllEnabledTreeNodeIds(selectedNodes)
+        ? '$__all'
+        : selectedNodes.length > 0
+        ? selectedNodes
+        : [];
+      locationService.partial({ [`var-${dashboardVariableName}`]: value }, true);
+    } else {
+      const value = includesAllTreeNodeIds(selectedNodes) ? '$__all' : selectedNodes.length > 0 ? selectedNodes : [];
+      locationService.partial({ [`var-${dashboardVariableName}`]: value }, true);
+    }
+  }, [
+    selectedNodes,
+    dashboardVariableName,
+    getProvidedNodes,
+    includesAllTreeNodeIds,
+    includesAllEnabledTreeNodeIds,
+    areNodeSelectionsEqual,
+    options.showCheckbox,
+    options.enableSelectDeselectAll,
+    options.includeDisabled,
+  ]);
 
   const [searchFilter, setSearchFilter] = React.useState<string>('');
   const [useFilterFn, setUseFilterFn] = React.useState<boolean>(false);
   const [inSearch, setInSearch] = React.useState<boolean>(false);
   const [expandedNodesBeforeSearch, setExpandedBeforeSearch] = React.useState<string[]>([]);
   const [treeData, setTreeData] = React.useState<TreeNode[]>(tree.value());
-
-  const traverse = (nodes: TreeNode[], currentDepth: number): string[] => {
-    const result: string[] = [];
-    for (const node of nodes) {
-      result.push(node.id);
-      result.push(...traverse(node.children || [], currentDepth + 1));
-    }
-    return result;
-  };
-
-  const getAllIds = (inputTree: TreeNode[]): string[] => {
-    return traverse(inputTree, 0);
-  };
 
   const escapeHTMLInputElement: React.KeyboardEventHandler<HTMLInputElement> = (event) => {
     if (event.key === 'Escape') {
@@ -141,12 +243,12 @@ export const TreeView = ({
       const searchResult = tree.findAll(searchFilter);
       const filtered = useFilterFn ? tree.filter(filterFn, searchResult) : searchResult;
       setTreeData(() => filtered);
-      setExpanded(() => getAllIds(filtered));
+      setExpanded(() => getTreeNodeIds(filtered, 0));
     } else {
       if (useFilterFn) {
         const filtered = tree.filter(filterFn);
         setTreeData(() => filtered);
-        setExpanded(() => getAllIds(filtered));
+        setExpanded(() => getTreeNodeIds(filtered, 0));
       } else {
         setTreeData(tree.value());
       }
@@ -155,7 +257,7 @@ export const TreeView = ({
   }, [JSON.stringify(tree.value()), useFilterFn]);
 
   const handleSearchInput: React.FormEventHandler<HTMLInputElement> = (event) => {
-    const searchTerm = (event.target as HTMLInputElement).value.trim();
+    const searchTerm = (event.target as HTMLInputElement).value;
     setSearchTerm(searchTerm);
   };
 
@@ -201,7 +303,7 @@ export const TreeView = ({
     const searchResult = tree.findAll(searchFilter);
     const filtered = useFilterFn ? tree.filter(filterFn, searchResult) : searchResult;
     setTreeData(() => filtered);
-    setExpanded(() => getAllIds(filtered));
+    setExpanded(() => getTreeNodeIds(filtered, 0));
   };
 
   const renderCellContent = (value: any, columnName: string, nodeId: string) => {
@@ -242,20 +344,27 @@ export const TreeView = ({
   };
 
   const treeNodes = tree.flatten(expandedNodes, 0, treeData);
-  const [activeNodeId, setActiveNodeId] = React.useState<string | null>(null);
+  const [activeNodeId, setActiveNodeId] = React.useState<string | null | undefined>(undefined);
 
   const handleTableFocus: React.FocusEventHandler = (event) => {
-    if (event.relatedTarget?.localName === 'tr' || event.relatedTarget === null) {
+    if (
+      event.relatedTarget?.localName === 'tr' ||
+      event.relatedTarget?.localName === 'input' ||
+      event.relatedTarget === null
+    ) {
       return;
     }
-    setActiveNodeId(treeNodes[0]?.node?.id ?? null);
+    setActiveNodeId(treeNodes[0]?.node?.id ?? undefined);
   };
 
   const handleTableBlur: React.FocusEventHandler = (event) => {
-    if (event.target?.parentElement?.parentElement?.id === event.relatedTarget?.parentElement?.parentElement?.id) {
+    if (
+      event.target?.localName === 'input' ||
+      event.target?.parentElement?.parentElement?.id === event.relatedTarget?.parentElement?.parentElement?.id
+    ) {
       return;
     }
-    setActiveNodeId(null);
+    setActiveNodeId(undefined);
   };
 
   const handleTableRowClick = (node: TreeNode, event: React.MouseEvent) => {
@@ -288,6 +397,45 @@ export const TreeView = ({
     setActiveNodeId(node.id);
   };
 
+  const handleCheckboxChange = (node: TreeNode, event: React.FormEvent) => {
+    if (options.clickMode === ClickMode.SetVariable || options.clickMode === ClickMode.Both) {
+      if (options.multiSelect) {
+        setSelected((prev) => {
+          return prev.includes(node.id) ? prev.filter((id) => id !== node.id) : [...prev, node.id];
+        });
+      } else {
+        setSelected([node.id]);
+      }
+    }
+    setActiveNodeId(node.id);
+  };
+
+  const toggleSelectAll = () => {
+    const shouldSelectAll =
+      selectedNodes.length !==
+      (options.showCheckbox && options.enableSelectDeselectAll && !options.includeDisabled
+        ? enabledTreeNodeIds.length
+        : allTreeNodeIds.length);
+    const ids = shouldSelectAll
+      ? [
+          ...(options.showCheckbox && options.enableSelectDeselectAll && !options.includeDisabled
+            ? enabledTreeNodeIds
+            : allTreeNodeIds),
+        ]
+      : [];
+
+    if (shouldSelectAll) {
+      setExpanded(ids);
+    }
+    setSelected(ids);
+  };
+
+  const handleCheckboxSelectDeselectAllChange = (event: React.FormEvent) => {
+    toggleSelectAll();
+    event.preventDefault();
+    event.stopPropagation();
+  };
+
   const handleKeyDown: React.KeyboardEventHandler = (event) => {
     if (!isArrowKey(event.key) && !isActionCode(event.code)) {
       return;
@@ -301,14 +449,17 @@ export const TreeView = ({
     }
 
     if (event.key === 'ArrowUp') {
+      if (activeNodeId === null) {
+        return; // no active node id
+      }
       setActiveNodeId((nodeId) => {
         const index = treeNodes.findIndex((item) => item.node.id === nodeId);
-        return index === 0 ? nodeId : treeNodes[index - 1].node.id;
+        return index === 0 ? null : treeNodes[index - 1].node.id;
       });
     }
 
     if (event.key === 'ArrowLeft') {
-      if (activeNodeId === null) {
+      if (activeNodeId === null || activeNodeId === undefined) {
         return; // no active node id
       }
       if (expandedNodes.includes(activeNodeId)) {
@@ -317,7 +468,7 @@ export const TreeView = ({
     }
 
     if (event.key === 'ArrowRight') {
-      if (activeNodeId === null) {
+      if (activeNodeId === null || activeNodeId === undefined) {
         return; // no active node id
       }
       const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
@@ -330,8 +481,12 @@ export const TreeView = ({
     }
 
     if (event.code === 'Space') {
-      if (activeNodeId === null) {
+      if (activeNodeId === undefined) {
         return; // no active node id
+      }
+      if (activeNodeId === null) {
+        toggleSelectAll();
+        return;
       }
       const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
       if (itemOption === undefined) {
@@ -345,8 +500,12 @@ export const TreeView = ({
     }
 
     if (event.code === 'Enter') {
-      if (activeNodeId === null) {
+      if (activeNodeId === undefined) {
         return; // no active node id
+      }
+      if (activeNodeId === null) {
+        toggleSelectAll();
+        return;
       }
       const itemOption = treeNodes.find((item) => item.node.id === activeNodeId);
       if (itemOption === undefined) {
@@ -452,9 +611,9 @@ export const TreeView = ({
       <>
         {parentIconVisible && parentIconNameOption !== undefined ? (
           <td className={'parentIconContent'} style={{ width: '1px' }}>
-            <IconButton
+            <Icon
               onClick={(event) => handleIconClick(event, node, filteredChildren)}
-              tooltip={options.iconClickTooltip}
+              // tooltip={options.iconClickTooltip}
               name={parentIconNameOption}
               style={parentIconStyle}
               tabIndex={-1}
@@ -474,6 +633,29 @@ export const TreeView = ({
     );
   };
 
+  const renderCheckbox = (node: TreeNode) => {
+    if (!options.showCheckbox) {
+      return <></>;
+    }
+
+    return (
+      <td style={{ width: '1px' }} onClick={(e) => e.stopPropagation()}>
+        <Checkbox
+          tabIndex={-1}
+          checked={selectedNodes.includes(node.id)}
+          onChange={(e) => {
+            handleCheckboxChange(node, e);
+            // e.stopPropagation();
+            // e.preventDefault();
+            // expandedNodes.includes(node.id)
+            //   ? setExpanded(expandedNodes.filter((id) => id !== node.id))
+            //   : setExpanded([...expandedNodes, node.id]);
+          }}
+        />
+      </td>
+    );
+  };
+
   const id = useId();
 
   return (
@@ -489,7 +671,7 @@ export const TreeView = ({
             onKeyDown={escapeHTMLInputElement}
             suffix={
               searchFilter &&
-              searchFilter.trim().length > 0 && (
+              searchFilter.length > 0 && (
                 <Icon
                   name="times"
                   onClick={(event) => {
@@ -525,13 +707,43 @@ export const TreeView = ({
             <tr>
               {showParentIconColumn && <th className={'parentIconSlot'}></th>}
               {showIconColumn && <th className={'iconSlot'}></th>}
-              <th>{options.labelColumn}</th>
-              {options.additionalColumns && options.additionalColumns.map((col) => <th key={col}>{col}</th>)}
+              {options.showCheckbox && <th></th>}
+              <th style={{ paddingLeft: '16px' }}>{options.labelColumn}</th>
+              {options.additionalColumns && options.additionalColumns.map((col, index) => <th key={col}>{col}</th>)}
             </tr>
           </thead>
         )}
         {
           <tbody>
+            {options.showCheckbox && options.enableSelectDeselectAll && (
+              <tr
+                onClick={(e) => {
+                  handleCheckboxSelectDeselectAllChange(e);
+                  // e.stopPropagation();
+                  // e.preventDefault();
+                  // expandedNodes.includes(node.id)
+                  //   ? setExpanded(expandedNodes.filter((id) => id !== node.id))
+                  //   : setExpanded([...expandedNodes, node.id]);
+                }}
+                className={clsx({
+                  'active-node': activeNodeId === null,
+                })}
+                onFocus={(e) => {
+                  setActiveNodeId(null);
+                }}
+                tabIndex={0}
+              >
+                {showParentIconColumn && <td className={'parentIconSlot'}></td>}
+                {showIconColumn && <td className={'iconSlot'}></td>}
+                <td>
+                  <Checkbox tabIndex={-1} checked={allNoneSelected} />
+                </td>
+                <td>
+                  <span style={{ marginLeft: `16px` }}>Select all / Deselect all</span>
+                </td>
+                {options.additionalColumns && options.additionalColumns.map((col) => <td key={col}></td>)}
+              </tr>
+            )}
             {tree.flatten(expandedNodes, 0, treeData).map(({ node, depth }, index) => {
               return (
                 <tr
@@ -542,20 +754,23 @@ export const TreeView = ({
                     'active-node': activeNodeId === node.id,
                   })}
                   onClick={(e) => handleTableRowClick(node, e)}
-                  tabIndex={index === 0 ? 0 : -1}
+                  tabIndex={index === 0 ? -1 : -1}
                 >
                   {renderIcons(node)}
+                  {renderCheckbox(node)}
                   <td>
-                    <span style={{ marginLeft: `${depth * 20}px` }}>
+                    <span
+                      style={{ marginLeft: `${(depth + (node.children && node.children.length > 0 ? 0 : 1)) * 16}px` }}
+                    >
                       {node.children && node.children.length > 0 && (
-                        <IconButton
+                        <Icon
                           onClick={(e) => {
                             e.stopPropagation();
                             expandedNodes.includes(node.id)
                               ? setExpanded(expandedNodes.filter((id) => id !== node.id))
                               : setExpanded([...expandedNodes, node.id]);
                           }}
-                          tooltip={expandedNodes.includes(node.id) ? 'Click to collapse' : 'Click to expand'}
+                          // tooltip={expandedNodes.includes(node.id) ? 'Click to collapse' : 'Click to expand'}
                           name={expandedNodes.includes(node.id) ? 'angle-down' : 'angle-right'}
                           tabIndex={-1}
                         />
@@ -565,8 +780,8 @@ export const TreeView = ({
                         !node.disabled &&
                         (node.link ? `${node.link}` : '').trim() !== '' && (
                           <a href={node.link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
-                            <IconButton
-                              tooltip={options.dataLinkNewTab ? 'Open link in new tab' : 'Open link'}
+                            <Icon
+                              // tooltip={options.dataLinkNewTab ? 'Open link in new tab' : 'Open link'}
                               name="external-link-alt"
                               style={{ paddingLeft: '8px', left: '-2px' }}
                             />
