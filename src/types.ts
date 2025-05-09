@@ -14,6 +14,9 @@ export enum ClickMode {
 export type TreeViewOptions = {
   clickMode: ClickMode;
   multiSelect: boolean;
+  showCheckbox: boolean;
+  enableSelectDeselectAll: boolean;
+  includeDisabled: boolean;
   showItemCount: boolean;
   toggleSelectMode: ToggleMode;
   supportsDisabled: boolean;
@@ -75,6 +78,9 @@ export interface RawNode {
 export interface PanelOptions {
   clickMode: ClickMode;
   multiSelect: boolean;
+  showCheckbox: boolean;
+  enableSelectDeselectAll: boolean;
+  includeDisabled: boolean;
   orderLevels: TreeLevelOrderMode;
   idColumn: string;
   labelColumn: string;

@@ -142,6 +142,36 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
         return currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both;
       },
     })
+    .addBooleanSwitch({
+      path: 'showCheckbox',
+      name: 'Show checkbox',
+      description: 'Select different nodes by using a checkbox in front of the label.',
+      defaultValue: true,
+      category: ['Toggle and select options'],
+      showIf(currentOptions) {
+        return (currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both) && currentOptions.multiSelect;
+      },
+    })
+    .addBooleanSwitch({
+      path: 'enableSelectDeselectAll',
+      name: 'Enable select/deselect all',
+      description: 'Add an option to the list to select or deselect all nodes at once.',
+      defaultValue: true,
+      category: ['Toggle and select options'],
+      showIf(currentOptions) {
+        return (currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both) && currentOptions.multiSelect && currentOptions.showCheckbox;
+      },
+    })
+    .addBooleanSwitch({
+      path: 'includeDisabled',
+      name: 'Include disabled nodes in select/deselect all',
+      description: 'Select or deselect disabled nodes when select/deselect all checkbox is clicked.',
+      defaultValue: false,
+      category: ['Toggle and select options'],
+      showIf(currentOptions) {
+        return (currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both) && currentOptions.multiSelect && currentOptions.showCheckbox && currentOptions.enableSelectDeselectAll;
+      },
+    })
     .addSelect({
       path: 'clickMode',
       name: 'Click mode',
