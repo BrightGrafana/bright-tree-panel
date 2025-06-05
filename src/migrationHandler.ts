@@ -78,6 +78,13 @@ export function migrationHandler(panel: PanelModel<Partial<PanelOptions>>) {
     };
   }
 
+  if (options.clickMode === 'DataLink') {
+    options.multiSelect = false;
+    options.showCheckbox = false;
+    options.enableSelectDeselectAll = false;
+    options.includeDisabled = false;
+  }
+
   if (options.multiSelect === true) {
     if (options.showCheckbox === undefined) {
       options.showCheckbox = true;

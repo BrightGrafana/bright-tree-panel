@@ -613,7 +613,7 @@ export const TreeView = ({
           <td className={'parentIconContent'} style={{ width: '1px' }}>
             <Icon
               onClick={(event) => handleIconClick(event, node, filteredChildren)}
-              // tooltip={options.iconClickTooltip}
+              aria-label={options.iconClickTooltip}
               name={parentIconNameOption}
               style={parentIconStyle}
               tabIndex={-1}
@@ -645,11 +645,6 @@ export const TreeView = ({
           checked={selectedNodes.includes(node.id)}
           onChange={(e) => {
             handleCheckboxChange(node, e);
-            // e.stopPropagation();
-            // e.preventDefault();
-            // expandedNodes.includes(node.id)
-            //   ? setExpanded(expandedNodes.filter((id) => id !== node.id))
-            //   : setExpanded([...expandedNodes, node.id]);
           }}
         />
       </td>
@@ -719,11 +714,6 @@ export const TreeView = ({
               <tr
                 onClick={(e) => {
                   handleCheckboxSelectDeselectAllChange(e);
-                  // e.stopPropagation();
-                  // e.preventDefault();
-                  // expandedNodes.includes(node.id)
-                  //   ? setExpanded(expandedNodes.filter((id) => id !== node.id))
-                  //   : setExpanded([...expandedNodes, node.id]);
                 }}
                 className={clsx({
                   'active-node': activeNodeId === null,
@@ -770,7 +760,7 @@ export const TreeView = ({
                               ? setExpanded(expandedNodes.filter((id) => id !== node.id))
                               : setExpanded([...expandedNodes, node.id]);
                           }}
-                          // tooltip={expandedNodes.includes(node.id) ? 'Click to collapse' : 'Click to expand'}
+                          aria-label={expandedNodes.includes(node.id) ? 'Click to collapse' : 'Click to expand'}
                           name={expandedNodes.includes(node.id) ? 'angle-down' : 'angle-right'}
                           tabIndex={-1}
                         />
@@ -779,11 +769,17 @@ export const TreeView = ({
                       {options.clickMode === ClickMode.Both &&
                         !node.disabled &&
                         (node.link ? `${node.link}` : '').trim() !== '' && (
-                          <a href={node.link} target={options.dataLinkNewTab ? '_blank' : undefined} rel="noreferrer">
+                          <a
+                            href={node.link}
+                            target={options.dataLinkNewTab ? '_blank' : undefined}
+                            rel="noreferrer"
+                            tabIndex={-1}
+                          >
                             <Icon
-                              // tooltip={options.dataLinkNewTab ? 'Open link in new tab' : 'Open link'}
+                              aria-label={options.dataLinkNewTab ? 'Open link in new tab' : 'Open link'}
                               name="external-link-alt"
-                              style={{ paddingLeft: '8px', left: '-2px' }}
+                              style={{ paddingLeft: '8px', marginTop: '-2px', width: '20px', height: '20px' }}
+                              tabIndex={-1}
                             />
                           </a>
                         )}
