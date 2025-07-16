@@ -191,7 +191,7 @@ export function panelOptions(builder: PanelOptionsEditorBuilder<PanelOptions>) {
       path: 'showCheckbox',
       name: 'Show checkbox',
       description: 'Select different nodes by using a checkbox in front of the label.',
-      defaultValue: true,
+      defaultValue: false,
       category: ['Toggle and select options'],
       showIf(currentOptions) {
         return (currentOptions.clickMode === ClickMode.SetVariable || currentOptions.clickMode === ClickMode.Both) && currentOptions.multiSelect;
