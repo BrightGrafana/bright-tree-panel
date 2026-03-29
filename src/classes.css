@@ -55,10 +55,10 @@
 .disabled-node {
     opacity: 0.5;
     pointer-events: none;
+}
 
-    & svg {
-        pointer-events: all;
-    }
+.disabled-node svg {
+    pointer-events: all;
 }
 
 .bright-tree-panel-table tr {
