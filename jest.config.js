@@ -2,7 +2,23 @@
 // generally used by snapshots, but can affect specific tests
 process.env.TZ = 'UTC';
 
+const { grafanaESModules, nodeModulesToTransform } = require('./.config/jest/utils');
+
 module.exports = {
   // Jest configuration provided by Grafana scaffolding
   ...require('./.config/jest.config'),
+  transformIgnorePatterns: [
+    nodeModulesToTransform([
+      ...grafanaESModules,
+      'marked',
+      'react-calendar',
+      'react-date-picker',
+      'react-time-picker',
+      'react-clock',
+      'get-user-locale',
+      'memoize',
+      'mimic-function',
+      '@wojtekmaj/date-utils',
+    ]),
+  ],
 };
