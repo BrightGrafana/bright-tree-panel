@@ -1,0 +1,44 @@
+{
+  "id": "equansdatahub-tree-panel",
+  "version": "1.7.5",
+  "plugin-validator": {
+    "codediff": [
+      {
+        "Severity": "suspected",
+        "Title": "Code diff skipped due to errors in osv-scanner",
+        "Detail": "Fix the errors reported by osv-scanner before code diff can run.",
+        "Name": "code-diff-skipped"
+      }
+    ],
+    "llmreview": [
+      {
+        "Severity": "suspected",
+        "Title": "LLM review skipped due to errors in osv-scanner",
+        "Detail": "Fix the errors reported by osv-scanner before LLM review can run.",
+        "Name": "llm-review-skipped"
+      }
+    ],
+    "osv-scanner": [
+      {
+        "Severity": "error",
+        "Title": "osv-scanner detected a high severity issue in package serialize-javascript",
+        "Detail": "SEVERITY: HIGH in package serialize-javascript, vulnerable to ",
+        "Name": "osv-scanner-high-severity-vulnerabilities-detected"
+      },
+      {
+        "Severity": "error",
+        "Title": "osv-scanner detected high severity issues",
+        "Detail": "osv-scanner detected 1 unique high severity issues for lockfile: package-lock.json",
+        "Name": "osv-scanner-high-severity-vulnerabilities-detected"
+      }
+    ],
+    "sponsorshiplink": [
+      {
+        "Severity": "recommendation",
+        "Title": "You can include a sponsorship link if you want users to support your work",
+        "Detail": "Consider to add a sponsorship link in your plugin.json file (Info.Links section: with Name: 'sponsor' or Name: 'sponsorship'), which will be shown on the plugin details page to allow users to support your work if they wish.",
+        "Name": "sponsorshiplink"
+      }
+    ]
+  }
+}
