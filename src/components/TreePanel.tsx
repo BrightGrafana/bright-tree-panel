@@ -6,7 +6,7 @@ import { TreeView } from './TreeView';
 import { Validator } from '../validator';
 import { Utils } from '../utils';
 import { Tree } from '../tree';
-import '../classes.css';
+import { treeViewClass } from './treeStyles';
 
 interface Props extends PanelProps<PanelOptions> {}
 
@@ -96,7 +96,7 @@ const RenderTreeViewWithData: React.FC<RenderTreeViewWithDataProps> = ({ options
   };
 
   return (
-    <div className={'treeView'}>
+    <div className={treeViewClass}>
       <TreeView tree={tree} options={treeViewOptions} expanded={expandedNodeIds} />
     </div>
   );

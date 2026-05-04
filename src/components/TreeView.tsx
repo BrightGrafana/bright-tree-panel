@@ -5,6 +5,23 @@ import { Tree } from 'tree';
 import { ClickMode, IconClickMode, TreeNode, TreeViewOptions } from 'types';
 import { Box, Checkbox, Icon, InlineField, InlineFieldRow, InlineSwitch, Input, toIconName } from '@grafana/ui';
 import { findMatch, hasMatch } from '../valueMapping';
+import {
+  activeNodeClass,
+  disabledNodeClass,
+  iconContentClass,
+  iconSlotClass,
+  mappedValueClass,
+  mappedValueInnerClass,
+  parentIconContentClass,
+  parentIconSlotClass,
+  selectedNodeClass,
+  tableClass,
+  tableCompactModeClass,
+  tableGridLinesClass,
+  tableHasIconContentClass,
+  tableHasParentIconContentClass,
+  tableNoGridLinesClass,
+} from './treeStyles';
 
 const CustomLabel = (props: { label: string | React.ReactNode; filter: string }) => {
   const filter = `${props.filter}`;
@@ -328,8 +345,8 @@ export const TreeView = ({
         : {};
 
       return (
-        <span data-testid={testId} className="mapped-value">
-          <span className="mapped-value-inner" style={style} data-has-color={!!mapping.result.color}>
+        <span data-testid={testId} className={mappedValueClass}>
+          <span className={mappedValueInnerClass} style={style} data-has-color={!!mapping.result.color}>
             <CustomLabel label={mapping.result.text || value} filter={searchFilter} />
           </span>
         </span>
@@ -392,7 +409,7 @@ export const TreeView = ({
         setSelected([node.id]);
       }
     } else if (options.clickMode === ClickMode.DataLink && node.link) {
-      window.open(node.link, options.dataLinkNewTab ? '_blank' : '_self');
+      window.open(node.link, options.dataLinkNewTab ? '_blank' : '_self', 'noopener,noreferrer');
     }
     setActiveNodeId(node.id);
   };
@@ -545,6 +562,33 @@ export const TreeView = ({
   const showParentIconColumn =
     showIconColumn && options.parentIconColumn && options.parentIconMappings.valueMappings.length > 0;
 
+  const tableHasIconContent =
+    !!showIconColumn &&
+    treeNodes.some(({ node }) => {
+      const iconMappingResultOption = findMatch(
+        node.additionalData?.[options.iconColumn],
+        options.iconMappings.valueMappings
+      );
+      return iconMappingResultOption !== null && toIconName(iconMappingResultOption.result.text) !== undefined;
+    });
+
+  const tableHasParentIconContent =
+    !!showParentIconColumn &&
+    treeNodes.some(({ node }) => {
+      const children = tree.flatFilter(filterFn, node.children);
+      const iconMappings = children
+        .map((node) =>
+          findMatch(node.additionalData?.[options.parentIconColumn], options.parentIconMappings.valueMappings)
+        )
+        .filter((value) => value !== null);
+      const parentIconMappingResultOption =
+        iconMappings.sort((a, b) => (a.index < b.index ? -1 : a.index > b.index ? 1 : 0))[0] ?? null;
+
+      return (
+        parentIconMappingResultOption !== null && toIconName(parentIconMappingResultOption.result.text) !== undefined
+      );
+    });
+
   const renderIcons = (node: TreeNode) => {
     if (!showIconColumn) {
       return <></>;
@@ -569,12 +613,12 @@ export const TreeView = ({
     if (!showParentIconColumn) {
       if (iconNameOption !== undefined) {
         return (
-          <td className={'iconContent'} style={{ width: '1px' }}>
+          <td className={iconContentClass} style={{ width: '1px' }}>
             <Icon name={iconNameOption} style={iconStyle} tabIndex={-1} />
           </td>
         );
       }
-      return <td className={'iconSlot'} style={{ width: '1px' }}></td>;
+      return <td className={iconSlotClass} style={{ width: '1px' }}></td>;
     }
 
     const children = tree.flatFilter(filterFn, node.children);
@@ -610,7 +654,7 @@ export const TreeView = ({
     return (
       <>
         {parentIconVisible && parentIconNameOption !== undefined ? (
-          <td className={'parentIconContent'} style={{ width: '1px' }}>
+          <td className={parentIconContentClass} style={{ width: '1px' }}>
             <Icon
               onClick={(event) => handleIconClick(event, node, filteredChildren)}
               aria-label={options.iconClickTooltip}
@@ -620,14 +664,14 @@ export const TreeView = ({
             />
           </td>
         ) : (
-          <td className={'parentIconSlot'}></td>
+          <td className={parentIconSlotClass}></td>
         )}
         {iconNameOption !== undefined ? (
-          <td className={'iconContent'} style={{ width: '1px' }}>
+          <td className={iconContentClass} style={{ width: '1px' }}>
             <Icon name={iconNameOption} style={iconStyle} tabIndex={-1} />
           </td>
         ) : (
-          <td className={'iconSlot'}></td>
+          <td className={iconSlotClass}></td>
         )}
       </>
     );
@@ -688,9 +732,12 @@ export const TreeView = ({
         </Box>
       )}
       <table
-        className={`bright-tree-panel-table grid-lines ${!options.showGridLines ? 'no-grid-lines' : ''} ${
-          options.compactMode ? 'compact-mode' : ''
-        }`}
+        className={clsx(tableClass, tableGridLinesClass, {
+          [tableNoGridLinesClass]: !options.showGridLines,
+          [tableCompactModeClass]: options.compactMode,
+          [tableHasIconContentClass]: tableHasIconContent,
+          [tableHasParentIconContentClass]: tableHasParentIconContent,
+        })}
         id={id}
         tabIndex={-1}
         onFocus={handleTableFocus}
@@ -700,8 +747,8 @@ export const TreeView = ({
         {options.showColumnHeaders && (
           <thead>
             <tr>
-              {showParentIconColumn && <th className={'parentIconSlot'}></th>}
-              {showIconColumn && <th className={'iconSlot'}></th>}
+              {showParentIconColumn && <th className={parentIconSlotClass}></th>}
+              {showIconColumn && <th className={iconSlotClass}></th>}
               {options.showCheckbox && <th></th>}
               <th style={{ paddingLeft: '16px' }}>{options.labelColumn}</th>
               {options.additionalColumns && options.additionalColumns.map((col, index) => <th key={col}>{col}</th>)}
@@ -716,15 +763,15 @@ export const TreeView = ({
                   handleCheckboxSelectDeselectAllChange(e);
                 }}
                 className={clsx({
-                  'active-node': activeNodeId === null,
+                  [activeNodeClass]: activeNodeId === null,
                 })}
                 onFocus={(e) => {
                   setActiveNodeId(null);
                 }}
                 tabIndex={0}
               >
-                {showParentIconColumn && <td className={'parentIconSlot'}></td>}
-                {showIconColumn && <td className={'iconSlot'}></td>}
+                {showParentIconColumn && <td className={parentIconSlotClass}></td>}
+                {showIconColumn && <td className={iconSlotClass}></td>}
                 <td>
                   <Checkbox tabIndex={-1} checked={allNoneSelected} />
                 </td>
@@ -739,9 +786,9 @@ export const TreeView = ({
                 <tr
                   key={node.id}
                   className={clsx({
-                    'disabled-node': options.supportsDisabled && node.disabled,
-                    'selected-node': selectedNodes.includes(node.id),
-                    'active-node': activeNodeId === node.id,
+                    [disabledNodeClass]: options.supportsDisabled && node.disabled,
+                    [selectedNodeClass]: selectedNodes.includes(node.id),
+                    [activeNodeClass]: activeNodeId === node.id,
                   })}
                   onClick={(e) => handleTableRowClick(node, e)}
                   tabIndex={index === 0 ? -1 : -1}
